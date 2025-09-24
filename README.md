@@ -2,6 +2,15 @@
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
+## Authentication
+
+This project uses NextAuth.js for authentication. In a development environment, you can log in with the following credentials:
+
+-   **Email**: `admin@example.com`
+-   **Password**: `password`
+
+These credentials can be configured in the `.env` file.
+
 ## What's next? How do I make an app with this?
 
 We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.

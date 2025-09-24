@@ -10,6 +10,9 @@ export const env = createEnv({
 		NODE_ENV: z.enum(["development", "test", "production"]),
 		LITELLM_PROXY_URL: z.string().url(),
 		LITELLM_API_KEY: z.string(),
+		NEXTAUTH_SECRET: z.string(),
+		ADMIN_EMAIL: z.string().email(),
+		ADMIN_PASSWORD: z.string(),
 	},
 
 	/**
@@ -29,6 +32,9 @@ export const env = createEnv({
 		NODE_ENV: process.env.NODE_ENV,
 		LITELLM_PROXY_URL: process.env.LITELLM_PROXY_URL,
 		LITELLM_API_KEY: process.env.LITELLM_API_KEY,
+		NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+		ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+		ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
 		// NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 	},
 	/**
