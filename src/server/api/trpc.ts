@@ -147,8 +147,9 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
 const enforceAdminUser = t.middleware(({ ctx, next }) => {
-	const email = ctx.session?.user?.email;
-	if (!email) {
+	const session = ctx.session;
+	const email = session?.user?.email;
+	if (!session || !email) {
 		throw new TRPCError({
 			code: "UNAUTHORIZED",
 			message: "Admin access required.",
@@ -161,8 +162,6 @@ const enforceAdminUser = t.middleware(({ ctx, next }) => {
 			message: "Admin access required.",
 		});
 	}
-
-	const session = ctx.session!;
 
 	return next({
 		ctx: {
