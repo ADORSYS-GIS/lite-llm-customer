@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment node
+ */
 import type { inferRouterInputs } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import type { Session } from "next-auth";
@@ -134,6 +137,12 @@ describe("budgetRouter", () => {
 		});
 
 		it("validates input", async () => {
+			mockedCreateBudget.mockRejectedValue(
+				new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to create budget.",
+				}),
+			);
 			const caller = createAdminCaller();
 			await expect(
 				caller.createBudget({

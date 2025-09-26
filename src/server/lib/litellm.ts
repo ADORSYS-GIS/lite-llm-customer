@@ -170,7 +170,7 @@ export async function assignBudget(userId: string, budgetId: string) {
 			user_id: userId,
 			budget_id: budgetId,
 		});
-		const response = await litellmClient.post("/budget/assign", payload);
+		const response = await litellmClient.post("/customer/new", payload);
 		return BudgetResponseSchema.parse(response.data);
 	} catch (error) {
 		if (isAxiosError(error)) {
