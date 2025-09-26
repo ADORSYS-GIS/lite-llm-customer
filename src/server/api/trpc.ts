@@ -6,7 +6,12 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC } from "@trpc/server";
+
+import { env } from "@/env.js";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { TRPCError, initTRPC } from "@trpc/server";
+import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { type Session, getServerSession } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -16,16 +21,40 @@ import { ZodError } from "zod";
  * This section defines the "contexts" that are available in the backend API.
  *
  * These allow you to access things when processing a request, like the database, the session, etc.
- *
- * This helper generates the "internals" for a tRPC context. The API handler and RSC clients each
- * wrap this and provides the required context.
- *
- * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
+
+interface CreateContextOptions {
+	session: Session | null;
+}
+
+/**
+ * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
+ * it from here.
+ *
+ * Examples of things you may need it for:
+ * - testing, so we don't have to mock Next.js' req/res
+ * - tRPC's `createSSGHelpers`, where we don't have req/res
+ *
+ * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
+ */
+const createInnerTRPCContext = (_opts: CreateContextOptions) => {
 	return {
-		...opts,
+		session: _opts.session,
 	};
+};
+
+/**
+ * This is the actual context you will use in your router. It will be used to process every request
+ * that goes through your tRPC endpoint.
+ *
+ * @see https://trpc.io/docs/context
+ */
+export const createTRPCContext = async (_opts: CreateNextContextOptions) => {
+	const session = await getServerSession(_opts.req, _opts.res, authOptions);
+
+	return createInnerTRPCContext({
+		session,
+	});
 };
 
 /**
@@ -35,6 +64,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
+
 const t = initTRPC.context<typeof createTRPCContext>().create({
 	transformer: superjson,
 	errorFormatter({ shape, error }) {
@@ -101,3 +131,49 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+	if (!ctx.session?.user) {
+		throw new TRPCError({ code: "UNAUTHORIZED" });
+	}
+	return next({
+		ctx: {
+			// infers the `session` as non-nullable
+			session: { ...ctx.session, user: ctx.session.user },
+		},
+	});
+});
+
+export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+const enforceAdminUser = t.middleware(({ ctx, next }) => {
+	const session = ctx.session;
+	const email = session?.user?.email;
+	if (!session || !email) {
+		throw new TRPCError({
+			code: "UNAUTHORIZED",
+			message: "Admin access required.",
+		});
+	}
+
+	if (email !== env.ADMIN_EMAIL) {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: "Admin access required.",
+		});
+	}
+
+	return next({
+		ctx: {
+			session: {
+				...session,
+				user: {
+					...session.user,
+					email,
+				},
+			},
+		},
+	});
+});
+
+export const adminProcedure = protectedProcedure.use(enforceAdminUser);
