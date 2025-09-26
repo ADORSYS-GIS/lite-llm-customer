@@ -30,6 +30,11 @@ This guide shows you how to set up LiteLLM as a proxy for Ollama models using Do
 
 Create these files in your project directory:
 
+```bash
+touch docker-compose.yml
+touch litellm-config.yaml
+```
+
 ### 1. `docker-compose.yml`
 
 ```yaml
@@ -74,7 +79,7 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - ./litellm_config.yaml:/app/config.yaml:ro
+      - ./litellm-config.yaml:/app/config.yaml:ro
     environment:
       LITELLM_MASTER_KEY: sk-1234
       LITELLM_SALT_KEY: this-is-a-random-salt
@@ -86,7 +91,7 @@ volumes:
   pgdata:
 ```
 
-### 2. `litellm_config.yaml`
+### 2. `litellm-config.yaml`
 
 ```yaml
 model_list:
@@ -150,7 +155,8 @@ docker exec -it ollama ollama list
 curl http://localhost:11434/api/tags
 
 # Check LiteLLM is working
-curl http://localhost:4000/health
+curl http://localhost:4000/health \
+  -H "Authorization: Bearer sk-1234"
 
 # Check LiteLLM models
 curl http://localhost:4000/models \
@@ -248,7 +254,8 @@ Access the admin interface at: `http://localhost:4000`
 
 ```bash
 # Check overall health
-curl http://localhost:4000/health
+curl http://localhost:4000/health \
+  -H "Authorization: Bearer sk-1234"
 
 # Check specific model
 curl http://localhost:4000/model/info/llama3.2 \
