@@ -7,6 +7,7 @@
  * need to use are documented accordingly near the end.
  */
 
+import { env } from "@/env.js";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
@@ -144,3 +145,16 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+const enforceAdminUser = t.middleware(({ ctx, next }) => {
+	const email = ctx.session.user.email;
+	if (!email || email !== env.ADMIN_EMAIL) {
+		throw new TRPCError({
+			code: email ? "FORBIDDEN" : "UNAUTHORIZED",
+			message: "Admin access required.",
+		});
+	}
+	return next();
+});
+
+export const adminProcedure = protectedProcedure.use(enforceAdminUser);

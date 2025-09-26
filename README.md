@@ -33,6 +33,25 @@ To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the fo
 
 You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
 
+## Server API
+
+### Budget Router
+
+All admin-only interactions with LiteLLM budgets and customers are exposed via the tRPC router under `budget.*` procedures.
+
+- `budget.listCustomers` – lists customers by calling the LiteLLM customer list endpoint.
+- `budget.getCustomerInfo` – fetches customer details given `{ end_user_id }`.
+- `budget.createBudget` – creates a budget with `{ user_id, budget_id }`.
+- `budget.assignBudget` – assigns an existing budget via `{ user_id, budget_id }`.
+
+Every procedure:
+
+- Uses Zod validation for its inputs and, where relevant, outputs.
+- Requires an authenticated admin session enforced by the `adminProcedure` middleware in `src/server/api/trpc.ts`.
+- Returns normalized, user-safe error messages using `TRPCError`.
+
+Refer to `src/server/api/routers/budget.ts` and `src/server/api/routers/budget.test.ts` for implementation and tests that mock the LiteLLM wrapper.
+
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.

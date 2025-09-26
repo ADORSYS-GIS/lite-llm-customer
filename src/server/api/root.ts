@@ -1,5 +1,5 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
-import { litellmRouter } from "./routers/litellm";
+import { budgetRouter } from "./routers/budget";
 
 /**
  * This is the primary router for your server.
@@ -7,7 +7,7 @@ import { litellmRouter } from "./routers/litellm";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-	litellm: litellmRouter,
+	budget: budgetRouter,
 });
 
 // export type definition of API
