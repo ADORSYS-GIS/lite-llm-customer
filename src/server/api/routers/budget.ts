@@ -30,11 +30,16 @@ const customerInfoSchema = z.object({
 });
 
 const createBudgetInputSchema = z.object({
+	budget_id: z.string().min(1, "budget_id is required"),
+	max_budget: z.number(),
+	currency: z.string(),
+	reset_interval: z.string(),
+});
+
+const assignBudgetInputSchema = z.object({
 	user_id: z.string().min(1, "user_id is required"),
 	budget_id: z.string().min(1, "budget_id is required"),
 });
-
-const assignBudgetInputSchema = createBudgetInputSchema;
 
 export const budgetRouter = createTRPCRouter({
 	listCustomers: adminProcedure.query(async () => {
@@ -70,7 +75,7 @@ export const budgetRouter = createTRPCRouter({
 	createBudget: adminProcedure
 		.input(createBudgetInputSchema)
 		.mutation(async ({ input }) => {
-			return createBudget(input.user_id, input.budget_id);
+			return createBudget(input);
 		}),
 	assignBudget: adminProcedure
 		.input(assignBudgetInputSchema)

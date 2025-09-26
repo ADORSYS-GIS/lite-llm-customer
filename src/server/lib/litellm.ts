@@ -21,9 +21,7 @@ const CustomerSchema = z.object({
 	max_budget: z.nullable(z.number()),
 });
 
-const CustomerListSchema = z.object({
-	data: z.array(CustomerSchema),
-});
+const CustomerListSchema = z.array(CustomerSchema);
 
 const CustomerInfoSchema = CustomerSchema.extend({
 	budgets: z.array(
@@ -36,14 +34,15 @@ const CustomerInfoSchema = CustomerSchema.extend({
 });
 
 const BudgetPayloadSchema = z.object({
-	user_id: z.string(),
 	budget_id: z.string(),
+	max_budget: z.number(),
+	currency: z.string(),
+	reset_interval: z.string(),
 });
 
 const BudgetResponseSchema = z.object({
-	// Assuming a simple success message or similar.
-	// Adjust if the actual response is different.
-	message: z.string(),
+	budget_id: z.string(),
+	max_budget: z.number(),
 });
 
 /**
@@ -54,7 +53,18 @@ const BudgetResponseSchema = z.object({
 export async function listCustomers() {
 	try {
 		const response = await litellmClient.get("/customer/list");
-		return CustomerListSchema.parse(response.data).data;
+		const transformedData = response.data.map(
+			(customer: {
+				user_id: string;
+				spend: number;
+				litellm_budget_table: { max_budget: number | null };
+			}) => ({
+				user_id: customer.user_id,
+				spend: customer.spend,
+				max_budget: customer.litellm_budget_table?.max_budget ?? null,
+			}),
+		);
+		return CustomerListSchema.parse(transformedData);
 	} catch (error) {
 		if (isAxiosError(error)) {
 			throw new TRPCError({
@@ -83,7 +93,21 @@ export async function getCustomerInfo(endUserId: string) {
 		const response = await litellmClient.get("/customer/info", {
 			params: { end_user_id: endUserId },
 		});
-		return CustomerInfoSchema.parse(response.data);
+		const info = response.data;
+		const transformedInfo = {
+			...info,
+			max_budget: info.litellm_budget_table?.max_budget ?? null,
+			budgets: info.litellm_budget_table
+				? [
+						{
+							budget_id: info.litellm_budget_table.budget_id,
+							max_budget: info.litellm_budget_table.max_budget,
+							spend: info.spend,
+						},
+					]
+				: [],
+		};
+		return CustomerInfoSchema.parse(transformedInfo);
 	} catch (error) {
 		if (isAxiosError(error)) {
 			throw new TRPCError({
@@ -109,12 +133,11 @@ export async function getCustomerInfo(endUserId: string) {
  * @returns A promise that resolves to the response from the API.
  * @throws Throws a TRPCError if the API call fails or the response is invalid.
  */
-export async function createBudget(userId: string, budgetId: string) {
+export async function createBudget(
+	budget: z.infer<typeof BudgetPayloadSchema>,
+) {
 	try {
-		const payload = BudgetPayloadSchema.parse({
-			user_id: userId,
-			budget_id: budgetId,
-		});
+		const payload = BudgetPayloadSchema.parse(budget);
 		const response = await litellmClient.post("/budget/new", payload);
 		return BudgetResponseSchema.parse(response.data);
 	} catch (error) {

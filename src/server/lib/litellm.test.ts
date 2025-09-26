@@ -77,8 +77,16 @@ describe("LiteLLM API Wrapper", () => {
 
 	describe("createBudget", () => {
 		it("should return a success message on creation", async () => {
-			const response = await createBudget("123", "budget-1");
-			expect(response).toEqual({ message: "Budget created" });
+			const response = await createBudget({
+				budget_id: "budget-1",
+				max_budget: 100,
+				currency: "USD",
+				reset_interval: "monthly",
+			});
+			expect(response).toEqual({
+				budget_id: "budget-1",
+				max_budget: 100,
+			});
 		});
 
 		it("should throw a TRPCError on failure", async () => {
@@ -87,7 +95,14 @@ describe("LiteLLM API Wrapper", () => {
 					return new HttpResponse(null, { status: 500 });
 				}),
 			);
-			await expect(createBudget("123", "budget-1")).rejects.toThrow(TRPCError);
+			await expect(
+				createBudget({
+					budget_id: "budget-1",
+					max_budget: 100,
+					currency: "USD",
+					reset_interval: "monthly",
+				}),
+			).rejects.toThrow(TRPCError);
 		});
 	});
 

@@ -110,33 +110,57 @@ describe("budgetRouter", () => {
 
 	describe("createBudget", () => {
 		it("creates budget", async () => {
-			mockedCreateBudget.mockResolvedValueOnce({ message: "ok" });
+			mockedCreateBudget.mockResolvedValueOnce({
+				budget_id: "budget-1",
+				max_budget: 100,
+			});
 			const caller = createAdminCaller();
 			const result = await caller.createBudget({
-				user_id: "user-1",
 				budget_id: "budget-1",
+				max_budget: 100,
+				currency: "USD",
+				reset_interval: "monthly",
 			});
-			expect(result).toEqual({ message: "ok" });
-			expect(mockedCreateBudget).toHaveBeenCalledWith("user-1", "budget-1");
+			expect(result).toEqual({
+				budget_id: "budget-1",
+				max_budget: 100,
+			});
+			expect(mockedCreateBudget).toHaveBeenCalledWith({
+				budget_id: "budget-1",
+				max_budget: 100,
+				currency: "USD",
+				reset_interval: "monthly",
+			});
 		});
 
 		it("validates input", async () => {
 			const caller = createAdminCaller();
 			await expect(
-				caller.createBudget({ user_id: "", budget_id: "budget-1" }),
+				caller.createBudget({
+					budget_id: "budget-1",
+					max_budget: 100,
+					currency: "USD",
+					reset_interval: "",
+				}),
 			).rejects.toBeInstanceOf(TRPCError);
 		});
 	});
 
 	describe("assignBudget", () => {
 		it("assigns budget", async () => {
-			mockedAssignBudget.mockResolvedValueOnce({ message: "ok" });
+			mockedAssignBudget.mockResolvedValueOnce({
+				budget_id: "budget-1",
+				max_budget: 100,
+			});
 			const caller = createAdminCaller();
 			const result = await caller.assignBudget({
 				user_id: "user-1",
 				budget_id: "budget-1",
 			});
-			expect(result).toEqual({ message: "ok" });
+			expect(result).toEqual({
+				budget_id: "budget-1",
+				max_budget: 100,
+			});
 			expect(mockedAssignBudget).toHaveBeenCalledWith("user-1", "budget-1");
 		});
 
