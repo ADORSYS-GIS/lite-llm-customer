@@ -8,6 +8,9 @@ import "./src/env.js";
 const config = {
 	reactStrictMode: true,
 
+	// Allow cross-origin requests in development for browser preview
+	allowedDevOrigins: ["127.0.0.1"],
+
 	/**
 	 * If you are using `appDir` then you must comment the below `i18n` config out.
 	 *
