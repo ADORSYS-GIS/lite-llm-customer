@@ -30,14 +30,14 @@ export const Layout = ({ children }: PropsWithChildren) => {
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined"> dashboard </span>
+						<span className="material-symbols-outlined"></span>
 						<span>Dashboard</span>
 					</a>
 					<a
 						className="flex items-center gap-3 rounded-lg bg-primary/10 px-4 py-2 font-medium text-primary text-sm"
 						href="/admin/customers"
 					>
-						<span className="material-symbols-outlined"> group </span>
+						<span className="material-symbols-outlined"> </span>
 						<span>Customers</span>
 					</a>
 					<a
@@ -46,7 +46,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
 					>
 						<span className="material-symbols-outlined">
 							{" "}
-							account_balance_wallet{" "}
+							{" "}
 						</span>
 						<span>Budgets</span>
 					</a>
@@ -54,14 +54,14 @@ export const Layout = ({ children }: PropsWithChildren) => {
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined"> assessment </span>
+						<span className="material-symbols-outlined"></span>
 						<span>Reports</span>
 					</a>
 					<a
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined"> settings </span>
+						<span className="material-symbols-outlined"></span>
 						<span>Settings</span>
 					</a>
 				</nav>
