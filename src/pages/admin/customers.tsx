@@ -13,50 +13,46 @@ const CustomersPage: NextPage = () => {
 		data: customers,
 		isLoading,
 		error,
-	} = api.budget.listCustomers.useQuery();
+	} = api.budget.listCustomersDetailed.useQuery();
 
 	// Filter customers based on search term and status
 	const filteredCustomers = useMemo(() => {
 		if (!customers) return [];
 
 		return customers.filter((customer) => {
-			const matchesSearch =
-				customer.user_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				`customer${customers.indexOf(customer) + 1}@example.com`
-					.toLowerCase()
-					.includes(searchTerm.toLowerCase());
-
-			const matchesStatus =
-				statusFilter === "All Status" ||
+			const matchesSearch = customer.user_id.toLowerCase().includes(searchTerm.toLowerCase());
+			
+			const matchesStatus = statusFilter === "All Status" || 
 				(statusFilter === "Active" && customer.spend > 0) ||
 				(statusFilter === "Inactive" && customer.spend === 0);
-
+			
 			return matchesSearch && matchesStatus;
 		});
 	}, [customers, searchTerm, statusFilter]);
 
-	// Generate a consistent creation date based on user_id hash
-	const getCreationDate = (userId: string) => {
-		// Create a simple hash from user_id to generate consistent dates
+	// Get creation date - use real date if available, otherwise generate consistent fallback
+	const getCreationDate = (customer: any) => {
+		if (customer.created_at) {
+			return new Date(customer.created_at).toLocaleDateString();
+		}
+		
+		// Fallback: Generate a consistent creation date based on user_id hash
+		const userId = customer.user_id;
 		let hash = 0;
 		for (let i = 0; i < userId.length; i++) {
 			const char = userId.charCodeAt(i);
 			hash = ((hash << 5) - hash) + char;
-			hash = hash & hash; // Convert to 32-bit integer
+			hash = hash & hash; // Convert to 32bit integer
 		}
-
-		// Use hash to generate a date within the last 2 years from a fixed reference point
-		const daysAgo = Math.abs(hash % 730); // 0-729 days ago (2 years)
-		// Use a fixed reference date instead of new Date() to avoid hydration issues
-		const referenceDate = new Date('2024-09-28'); // Fixed reference point
-		const creationDate = new Date(referenceDate);
-		creationDate.setDate(creationDate.getDate() - daysAgo);
-
-		return creationDate.toLocaleDateString('en-US', {
-			year: 'numeric',
-			month: '2-digit',
-			day: '2-digit'
-		});
+		
+		// Use hash to generate a date within the last 2 years
+		const now = new Date();
+		const twoYearsAgo = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate());
+		const timeDiff = now.getTime() - twoYearsAgo.getTime();
+		const randomTime = Math.abs(hash) % timeDiff;
+		const creationDate = new Date(twoYearsAgo.getTime() + randomTime);
+		
+		return creationDate.toLocaleDateString();
 	};
 
 	if (isLoading) {
@@ -128,24 +124,24 @@ const CustomersPage: NextPage = () => {
 								Manage and monitor your customer accounts
 							</p>
 						</div>
-						<button
-							type="button"
+						<Link
+							href="/admin/customers/new"
 							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0"
 						>
-							<span className="material-symbols-outlined text-base">add</span>
+							<span className="material-symbols-outlined text-base"></span>
 							Add Customer
-						</button>
+						</Link>
 					</div>
 					<div className="mb-6 space-y-4 md:flex md:items-center md:justify-between md:space-y-0">
 						<div className="relative flex-1 md:max-w-xs">
 							<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
 								<span className="material-symbols-outlined text-black/40 dark:text-white/40">
-									search
+									
 								</span>
 							</div>
 							<input
 								className="w-full rounded-lg border border-black/10 bg-background-light py-2 pr-4 pl-10 transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto dark:border-white/10 dark:bg-background-dark"
-								placeholder="Search by name or email..."
+								placeholder="Search by email / customer ID..."
 								type="text"
 								value={searchTerm}
 								onChange={(e) => setSearchTerm(e.target.value)}
@@ -164,7 +160,7 @@ const CustomersPage: NextPage = () => {
 								</select>
 								<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
 									<span className="material-symbols-outlined text-sm">
-										expand_more
+										
 									</span>
 								</div>
 							</div>
@@ -179,9 +175,6 @@ const CustomersPage: NextPage = () => {
 								<tr>
 									<th className="px-6 py-3" scope="col">
 										Customer
-									</th>
-									<th className="hidden px-6 py-3 md:table-cell" scope="col">
-										Email
 									</th>
 									<th className="hidden px-6 py-3 lg:table-cell" scope="col">
 										Status
@@ -208,7 +201,10 @@ const CustomersPage: NextPage = () => {
 												className="whitespace-nowrap px-6 py-4 font-medium"
 												scope="row"
 											>
-												<div className="flex items-center gap-3">
+												<Link 
+													href={`/admin/customers/${customer.user_id}`}
+													className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+												>
 													<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 font-bold text-primary text-sm">
 														{customer.user_id.substring(0, 2).toUpperCase()}
 													</div>
@@ -220,32 +216,29 @@ const CustomersPage: NextPage = () => {
 															ID: {customer.user_id}
 														</div>
 													</div>
-												</div>
+												</Link>
 											</th>
-											<td className="hidden px-6 py-4 text-black/80 md:table-cell dark:text-white/80">
-												customer{originalIndex + 1}@example.com
-											</td>
 											<td className="hidden px-6 py-4 lg:table-cell">
 												<span
 													className={`rounded-full px-2 py-1 font-medium text-xs ${
 														isActive
-															? "bg-green-500/20 text-green-400"
-															: "bg-gray-500/20 text-gray-400"
+															? "bg-green-500/20 text-white"
+															: "bg-gray-500/20 text-white"
 													}`}
 												>
 													{isActive ? "Active" : "Inactive"}
 												</span>
 											</td>
 											<td className="hidden px-6 py-4 text-black/80 lg:table-cell dark:text-white/80">
-												{getCreationDate(customer.user_id)}
+												{getCreationDate(customer)}
 											</td>
 											<td className="px-6 py-4 text-right">
-												<button
-													type="button"
+												<Link
+													href={`/admin/customers/${customer.user_id}`}
 													className="font-medium text-primary hover:underline"
 												>
 													View details
-												</button>
+												</Link>
 											</td>
 										</tr>
 									);
