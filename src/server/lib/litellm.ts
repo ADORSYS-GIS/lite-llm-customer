@@ -295,14 +295,42 @@ export async function createBudget(
  */
 export async function assignBudget(userId: string, budgetId: string) {
 	try {
+		// First, check if the budget exists
+		const budgets = await listBudgets();
+		const budgetExists = budgets.some(budget => budget.budget_id === budgetId);
+		
+		if (!budgetExists) {
+			throw new TRPCError({
+				code: "NOT_FOUND",
+				message: `Budget with ID "${budgetId}" does not exist. Please create the budget first.`,
+			});
+		}
+
+		// If budget exists, proceed with assignment
 		const payload = AssignBudgetPayloadSchema.parse({
 			user_id: userId,
 			budget_id: budgetId,
 		});
+		
 		const response = await litellmClient.post("/customer/new", payload);
 		return response.data;
 	} catch (error) {
+		// If it's already a TRPCError (like our NOT_FOUND), just rethrow it
+		if (error instanceof TRPCError) {
+			throw error;
+		}
+
+		// Handle axios errors
 		if (isAxiosError(error)) {
+			// Handle foreign key constraint error specifically
+			if (error.response?.status === 500 && 
+				error.response?.data?.error?.message?.includes('Foreign key constraint failed')) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `Budget with ID "${budgetId}" does not exist. Please create the budget first.`,
+				});
+			}
+
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
 				message:
@@ -310,9 +338,11 @@ export async function assignBudget(userId: string, budgetId: string) {
 				cause: error,
 			});
 		}
+
+		// Handle any other errors
 		throw new TRPCError({
 			code: "INTERNAL_SERVER_ERROR",
-			message: "Failed to assign budget.",
+			message: error instanceof Error ? error.message : "Failed to assign budget.",
 			cause: error,
 		});
 	}

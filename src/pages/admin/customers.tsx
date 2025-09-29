@@ -201,11 +201,8 @@ const CustomersPage: NextPage = () => {
 														{customer.user_id.substring(0, 2).toUpperCase()}
 													</div>
 													<div>
-														<div className="font-semibold text-base text-white">
-															Customer {originalIndex + 1}
-														</div>
-														<div className="font-normal text-white/60">
-															ID: {customer.user_id}
+														<div className="font-bold text-base text-white">
+															{customer.user_id}
 														</div>
 													</div>
 												</Link>

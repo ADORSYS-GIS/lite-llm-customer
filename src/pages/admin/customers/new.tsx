@@ -14,6 +14,9 @@ const NewCustomerPage: NextPage = () => {
 
 	const assignBudgetMutation = api.budget.assignBudget.useMutation({
 		onSuccess: () => {
+			// Clear the form before redirecting
+			setUserId("");
+			setBudgetId("");
 			router.push("/admin/customers");
 		},
 		onError: (error) => {
@@ -81,14 +84,6 @@ const NewCustomerPage: NextPage = () => {
 			<main className="flex-grow">
 				<div className="container mx-auto px-4 py-8">
 					<div className="mb-8">
-						<div className="mb-4 flex items-center gap-4">
-							<Link
-								href="/admin/customers"
-								className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-							>
-								← Back to Customers
-							</Link>
-						</div>
 						<h2 className="mb-2 font-bold text-3xl text-white">
 							Add New Customer
 						</h2>
@@ -139,10 +134,38 @@ const NewCustomerPage: NextPage = () => {
 							</div>
 
 							{assignBudgetMutation.error && (
-								<div className="rounded-lg border border-red-500/30 bg-red-500/20 p-3">
-									<p className="text-red-400 text-sm">
-										{assignBudgetMutation.error.message}
-									</p>
+								<div className="mb-4 space-y-2">
+									<div className="flex items-start rounded-lg bg-red-500/10 p-3">
+										<svg
+											className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fillRule="evenodd"
+												d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+												clipRule="evenodd"
+											/>
+										</svg>
+										<p className="ml-2 text-sm text-red-500">
+											{assignBudgetMutation.error.data?.code === 'NOT_FOUND' 
+												? `Budget ID "${budgetId}" not found.`
+												: assignBudgetMutation.error.message}
+										</p>
+									</div>
+									{assignBudgetMutation.error.data?.code === 'NOT_FOUND' && (
+										<div className="flex items-center justify-between rounded-b-lg bg-red-900/10 px-3 py-2">
+											<p className="text-xs text-red-400">
+												Would you like to create this budget?
+											</p>
+											<Link 
+												href={`/admin/budgets/new?budgetId=${encodeURIComponent(budgetId)}`}
+												className="text-xs font-medium text-red-500 hover:text-red-400 hover:underline"
+											>
+												Create Budget →
+											</Link>
+										</div>
+									)}
 								</div>
 							)}
 

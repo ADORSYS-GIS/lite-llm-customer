@@ -234,68 +234,6 @@ export default function AdminDashboard() {
 									</p>
 								</div>
 							</Link>
-
-							<Link
-								href="/admin/customers/new"
-								className="flex w-full items-center rounded-lg border border-slate-200 p-3 text-left transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
-							>
-								<div className="mr-3 flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
-									<svg
-										className="h-5 w-5 text-green-500"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										role="img"
-									>
-										<title>Budgets Icon</title>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-										/>
-									</svg>
-								</div>
-								<div>
-									<p className="font-medium text-slate-900 dark:text-white">
-										Add New Customer
-									</p>
-									<p className="text-slate-600 text-sm dark:text-slate-400">
-										Create a new customer account
-									</p>
-								</div>
-							</Link>
-
-							<Link
-								href="/admin/budgets/new"
-								className="flex w-full items-center rounded-lg border border-slate-200 p-3 text-left transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
-							>
-								<div className="mr-3 flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/20">
-									<svg
-										className="h-5 w-5 text-purple-500"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										role="img"
-									>
-										<title>Reports Icon</title>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-										/>
-									</svg>
-								</div>
-								<div>
-									<p className="font-medium text-slate-900 dark:text-white">
-										Create Budget
-									</p>
-									<p className="text-slate-600 text-sm dark:text-slate-400">
-										Set up new budget limits
-									</p>
-								</div>
-							</Link>
 						</div>
 					</div>
 

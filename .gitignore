@@ -43,5 +43,6 @@ yarn-error.log*
 *.tsbuildinfo
 
 # idea files
-.ideadocker-compose.yml
+.idea
+docker-compose.yml
 litellm-config.yaml

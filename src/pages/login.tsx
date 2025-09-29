@@ -1,11 +1,20 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
+	const { error: urlError } = router.query;
+
+	useEffect(() => {
+		// Handle error from URL (e.g., from unauthorized redirect)
+		if (urlError === "CredentialsSignin") {
+			setError("Invalid email or password. Please try again.");
+		}
+	}, [urlError]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -18,8 +27,8 @@ const LoginPage = () => {
 		if (result?.ok) {
 			router.push("/");
 		} else {
-			// Handle login error
-			console.error("Login failed");
+			setError("Invalid email or password. Please try again.");
+			setPassword(""); // Clear password field on error
 		}
 	};
 
@@ -40,6 +49,30 @@ const LoginPage = () => {
 							<p className="mt-2 text-slate-600 dark:text-slate-400">
 								Sign in to continue
 							</p>
+							{error && (
+								<div className="rounded-md bg-red-50 p-4 dark:bg-red-900/30">
+									<div className="flex">
+										<div className="flex-shrink-0">
+											<svg
+												className="h-5 w-5 text-red-400"
+												viewBox="0 0 20 20"
+												fill="currentColor"
+											>
+												<path
+													fillRule="evenodd"
+													d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+													clipRule="evenodd"
+												/>
+											</svg>
+										</div>
+										<div className="ml-3">
+											<h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+												{error}
+											</h3>
+										</div>
+									</div>
+								</div>
+							)}
 						</div>
 						<form className="space-y-6" onSubmit={handleSubmit}>
 							<div>
