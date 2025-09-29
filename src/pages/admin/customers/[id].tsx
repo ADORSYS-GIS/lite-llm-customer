@@ -28,7 +28,7 @@ const CustomerDetailPage: NextPage = () => {
 
 	if (error) {
 		return (
-			<div className="min-h-screen bg-background-light font-display dark:bg-background-dark p-8">
+			<div className="min-h-screen bg-background-light p-8 font-display dark:bg-background-dark">
 				Error: {error.message}
 			</div>
 		);
@@ -45,7 +45,10 @@ const CustomerDetailPage: NextPage = () => {
 				<div className="container mx-auto px-4">
 					<div className="flex h-16 items-center justify-between">
 						<div className="flex items-center space-x-8">
-							<Link href="/" className="font-bold text-slate-900 text-xl dark:text-white">
+							<Link
+								href="/"
+								className="font-bold text-slate-900 text-xl dark:text-white"
+							>
 								LiteClient
 							</Link>
 							<nav className="hidden items-center space-x-6 md:flex">

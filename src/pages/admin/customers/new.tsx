@@ -140,6 +140,9 @@ const NewCustomerPage: NextPage = () => {
 											className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500"
 											viewBox="0 0 20 20"
 											fill="currentColor"
+											aria-hidden="true"
+											role="img"
+											aria-label="Error"
 										>
 											<path
 												fillRule="evenodd"
@@ -147,20 +150,20 @@ const NewCustomerPage: NextPage = () => {
 												clipRule="evenodd"
 											/>
 										</svg>
-										<p className="ml-2 text-sm text-red-500">
-											{assignBudgetMutation.error.data?.code === 'NOT_FOUND' 
+										<p className="ml-2 text-red-500 text-sm">
+											{assignBudgetMutation.error.data?.code === "NOT_FOUND"
 												? `Budget ID "${budgetId}" not found.`
 												: assignBudgetMutation.error.message}
 										</p>
 									</div>
-									{assignBudgetMutation.error.data?.code === 'NOT_FOUND' && (
+									{assignBudgetMutation.error.data?.code === "NOT_FOUND" && (
 										<div className="flex items-center justify-between rounded-b-lg bg-red-900/10 px-3 py-2">
-											<p className="text-xs text-red-400">
+											<p className="text-red-400 text-xs">
 												Would you like to create this budget?
 											</p>
-											<Link 
+											<Link
 												href={`/admin/budgets/new?budgetId=${encodeURIComponent(budgetId)}`}
-												className="text-xs font-medium text-red-500 hover:text-red-400 hover:underline"
+												className="font-medium text-red-500 text-xs hover:text-red-400 hover:underline"
 											>
 												Create Budget →
 											</Link>

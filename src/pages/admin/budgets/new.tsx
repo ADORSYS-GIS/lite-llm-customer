@@ -43,7 +43,10 @@ const CreateBudgetPage: NextPage = () => {
 								LiteClient
 							</h1>
 							<nav className="hidden items-center space-x-6 md:flex">
-								<Link href="/" className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+								<Link
+									href="/"
+									className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+								>
 									Dashboard
 								</Link>
 								<Link
@@ -79,30 +82,36 @@ const CreateBudgetPage: NextPage = () => {
 					<h1 className="mb-2 font-bold text-3xl text-slate-900 dark:text-white">
 						Create Budget
 					</h1>
-					<form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5 max-w-2xl">
+					<form
+						onSubmit={handleSubmit(onSubmit)}
+						className="mt-8 max-w-2xl space-y-5"
+					>
 						<div>
 							<label
 								htmlFor="budget_id"
-								className="block font-medium text-sm text-white/90 mb-1.5"
+								className="mb-1.5 block font-medium text-sm text-white/90"
 							>
 								Budget ID
 							</label>
 							<div className="mt-1">
 								<input
 									id="budget_id"
-									{...register("budget_id", { 
+									{...register("budget_id", {
 										required: "Budget ID is required",
-										minLength: { value: 3, message: "Budget ID must be at least 3 characters" },
+										minLength: {
+											value: 3,
+											message: "Budget ID must be at least 3 characters",
+										},
 									})}
 									placeholder="e.g., free-tier, pro-plan, team-account"
-									className="w-full rounded-lg border border-slate-600/50 bg-background-dark py-2.5 px-4 text-sm text-white transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
+									className="w-full rounded-lg border border-slate-600/50 bg-background-dark px-4 py-2.5 text-sm text-white transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
 								/>
 							</div>
 						</div>
 						<div>
 							<label
 								htmlFor="max_budget"
-								className="block font-medium text-sm text-white/90 mb-1.5"
+								className="mb-1.5 block font-medium text-sm text-white/90"
 							>
 								Max Budget
 							</label>
@@ -113,18 +122,18 @@ const CreateBudgetPage: NextPage = () => {
 									{...register("max_budget", {
 										required: "Maximum budget is required",
 										valueAsNumber: true,
-										min: { value: 1, message: "Budget must be greater than 0" }
+										min: { value: 1, message: "Budget must be greater than 0" },
 									})}
 									placeholder="e.g., 100, 500, 1000"
 									step="0.01"
-									className="w-full rounded-lg border border-slate-600/50 bg-background-dark py-2.5 px-4 text-sm text-white transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
+									className="w-full rounded-lg border border-slate-600/50 bg-background-dark px-4 py-2.5 text-sm text-white transition-all focus:border-primary focus:ring-2 focus:ring-primary/30"
 								/>
 							</div>
 						</div>
 						<div>
 							<label
 								htmlFor="budget_duration"
-								className="block font-medium text-sm text-white/90 mb-1.5"
+								className="mb-1.5 block font-medium text-sm text-white/90"
 							>
 								Reset Interval
 							</label>
@@ -143,16 +152,16 @@ const CreateBudgetPage: NextPage = () => {
 								<option value="yearly">Yearly</option>
 							</select>
 						</div>
-						<div className="pt-4 flex items-center justify-end space-x-3">
+						<div className="flex items-center justify-end space-x-3 pt-4">
 							<Link
 								href="/admin/budgets"
-								className="rounded-lg border border-slate-600/50 bg-transparent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
+								className="rounded-lg border border-slate-600/50 bg-transparent px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
 							>
 								Cancel
 							</Link>
 							<button
 								type="submit"
-								className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark disabled:opacity-70"
+								className="rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark disabled:opacity-70"
 								disabled={createBudget.isPending}
 							>
 								{createBudget.isPending ? "Creating..." : "Create Budget"}

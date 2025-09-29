@@ -1,6 +1,6 @@
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const LoginPage = () => {
 	const [email, setEmail] = useState("");
@@ -57,6 +57,9 @@ const LoginPage = () => {
 												className="h-5 w-5 text-red-400"
 												viewBox="0 0 20 20"
 												fill="currentColor"
+												aria-hidden="true"
+												role="img"
+												aria-label="Error"
 											>
 												<path
 													fillRule="evenodd"
@@ -66,7 +69,7 @@ const LoginPage = () => {
 											</svg>
 										</div>
 										<div className="ml-3">
-											<h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+											<h3 className="font-medium text-red-800 text-sm dark:text-red-200">
 												{error}
 											</h3>
 										</div>
