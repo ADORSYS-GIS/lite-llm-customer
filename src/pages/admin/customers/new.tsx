@@ -1,10 +1,10 @@
 import { Spinner } from "@/components/Spinner";
 import { api } from "@/utils/api";
+import type { NextPage } from "next";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import type { NextPage } from "next";
 
 const NewCustomerPage: NextPage = () => {
 	const router = useRouter();
@@ -25,7 +25,7 @@ const NewCustomerPage: NextPage = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!userId.trim() || !budgetId.trim()) return;
-		
+
 		setIsSubmitting(true);
 		assignBudgetMutation.mutate({
 			user_id: userId.trim(),
@@ -34,24 +34,41 @@ const NewCustomerPage: NextPage = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-background-light dark:bg-background-dark font-display">
+		<div className="min-h-screen bg-background-light font-display dark:bg-background-dark">
 			{/* Header */}
-			<header className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+			<header className="sticky top-0 z-10 border-slate-200 border-b bg-white/80 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
 				<div className="container mx-auto px-4">
-					<div className="flex items-center justify-between h-16">
+					<div className="flex h-16 items-center justify-between">
 						<div className="flex items-center space-x-8">
-							<h1 className="text-xl font-bold text-slate-900 dark:text-white">LiteClient</h1>
-							<nav className="hidden md:flex items-center space-x-6">
-								<Link href="/" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Dashboard</Link>
-								<Link href="/admin/customers" className="text-sm font-medium text-primary">Customers</Link>
-								<Link href="/admin/budgets" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Budgets</Link>
+							<h1 className="font-bold text-slate-900 text-xl dark:text-white">
+								LiteClient
+							</h1>
+							<nav className="hidden items-center space-x-6 md:flex">
+								<Link
+									href="/"
+									className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+								>
+									Dashboard
+								</Link>
+								<Link
+									href="/admin/customers"
+									className="font-medium text-primary text-sm"
+								>
+									Customers
+								</Link>
+								<Link
+									href="/admin/budgets"
+									className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+								>
+									Budgets
+								</Link>
 							</nav>
 						</div>
 						<div className="flex items-center space-x-4">
-							<button 
+							<button
 								type="button"
 								onClick={() => signOut()}
-								className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+								className="font-medium text-red-500 text-sm transition-colors hover:text-red-600"
 							>
 								Sign Out
 							</button>
@@ -64,23 +81,30 @@ const NewCustomerPage: NextPage = () => {
 			<main className="flex-grow">
 				<div className="container mx-auto px-4 py-8">
 					<div className="mb-8">
-						<div className="flex items-center gap-4 mb-4">
-							<Link 
+						<div className="mb-4 flex items-center gap-4">
+							<Link
 								href="/admin/customers"
-								className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+								className="text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
 							>
 								← Back to Customers
 							</Link>
 						</div>
-						<h2 className="text-3xl font-bold text-white mb-2">Add New Customer</h2>
-						<p className="text-white/60">Create a new customer by assigning them to a budget</p>
+						<h2 className="mb-2 font-bold text-3xl text-white">
+							Add New Customer
+						</h2>
+						<p className="text-white/60">
+							Create a new customer by assigning them to a budget
+						</p>
 					</div>
 
 					{/* Form */}
 					<div className="max-w-md">
 						<form onSubmit={handleSubmit} className="space-y-6">
 							<div>
-								<label htmlFor="userId" className="block text-sm font-medium text-white mb-2">
+								<label
+									htmlFor="userId"
+									className="mb-2 block font-medium text-sm text-white"
+								>
 									Customer Email (ID)
 								</label>
 								<input
@@ -88,7 +112,7 @@ const NewCustomerPage: NextPage = () => {
 									type="email"
 									value={userId}
 									onChange={(e) => setUserId(e.target.value)}
-									className="w-full px-3 py-2 border border-white/10 bg-background-dark text-white rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition"
+									className="w-full rounded-lg border border-white/10 bg-background-dark px-3 py-2 text-white transition focus:border-primary focus:ring-2 focus:ring-primary"
 									placeholder="e.g., customer@example.com"
 									required
 									disabled={isSubmitting}
@@ -96,7 +120,10 @@ const NewCustomerPage: NextPage = () => {
 							</div>
 
 							<div>
-								<label htmlFor="budgetId" className="block text-sm font-medium text-white mb-2">
+								<label
+									htmlFor="budgetId"
+									className="mb-2 block font-medium text-sm text-white"
+								>
 									Budget ID
 								</label>
 								<input
@@ -104,7 +131,7 @@ const NewCustomerPage: NextPage = () => {
 									type="text"
 									value={budgetId}
 									onChange={(e) => setBudgetId(e.target.value)}
-									className="w-full px-3 py-2 border border-white/10 bg-background-dark text-white rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition"
+									className="w-full rounded-lg border border-white/10 bg-background-dark px-3 py-2 text-white transition focus:border-primary focus:ring-2 focus:ring-primary"
 									placeholder="e.g., free-tier"
 									required
 									disabled={isSubmitting}
@@ -112,7 +139,7 @@ const NewCustomerPage: NextPage = () => {
 							</div>
 
 							{assignBudgetMutation.error && (
-								<div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+								<div className="rounded-lg border border-red-500/30 bg-red-500/20 p-3">
 									<p className="text-red-400 text-sm">
 										{assignBudgetMutation.error.message}
 									</p>
@@ -123,15 +150,15 @@ const NewCustomerPage: NextPage = () => {
 								<button
 									type="submit"
 									disabled={isSubmitting || !userId.trim() || !budgetId.trim()}
-									className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
 								>
 									{isSubmitting && <Spinner />}
 									{isSubmitting ? "Creating..." : "Create Customer"}
 								</button>
-								
+
 								<Link
 									href="/admin/customers"
-									className="px-4 py-2 border border-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/5 transition-colors"
+									className="rounded-lg border border-white/10 px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-white/5"
 								>
 									Cancel
 								</Link>

@@ -1,15 +1,15 @@
 import { Spinner } from "@/components/Spinner";
 import { api } from "@/utils/api";
+import type { NextPage } from "next";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import type { NextPage } from "next";
 
 const BudgetsPage: NextPage = () => {
 	const {
 		data: budgets,
 		isLoading: budgetsLoading,
 		error: budgetsError,
-		refetch
+		refetch,
 	} = api.budget.listBudgets.useQuery();
 
 	const {
@@ -30,44 +30,82 @@ const BudgetsPage: NextPage = () => {
 	}
 
 	if (error) {
-		return <div className="flex h-screen items-center justify-center">Error loading budgets: {error.message}</div>;
+		return (
+			<div className="flex h-screen items-center justify-center">
+				Error loading budgets: {error.message}
+			</div>
+		);
+	}
+
+	// Define types for the customer data structure
+	interface BudgetTable {
+		budget_id: string;
+		max_budget: number | null;
+		spend: number;
+		created_at?: string;
+	}
+
+	interface Customer {
+		user_id: string;
+		email: string | null;
+		spend: number;
+		max_budget: number | null;
+		created_at: string | null;
+		blocked: boolean;
+		litellm_budget_table: BudgetTable | null;
 	}
 
 	// Provide fallback for undefined budgets and customers
 	const budgetList = budgets || [];
-	const customerList = customers || [];
+	const customerList = (customers || []) as Customer[];
 
 	// Function to count customers assigned to a specific budget
 	const getCustomerCountForBudget = (budgetId: string) => {
-		return customerList.filter(customer => {
-			const customerData = customer as any;
-			return customerData.litellm_budget_table?.budget_id === budgetId;
-		}).length;
+		return customerList.filter(
+			(customer) => customer.litellm_budget_table?.budget_id === budgetId,
+		).length;
 	};
 
 	// Calculate total assigned customers across all budgets
-	const totalAssignedCustomers = customerList.filter(customer => {
-		const customerData = customer as any;
-		return customerData.litellm_budget_table !== null && customerData.litellm_budget_table !== undefined;
-	}).length;
+	const totalAssignedCustomers = customerList.filter(
+		(customer) => customer.litellm_budget_table !== null,
+	).length;
 
 	return (
-		<div className="min-h-screen bg-background-light dark:bg-background-dark font-display">
-			<header className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+		<div className="min-h-screen bg-background-light font-display dark:bg-background-dark">
+			<header className="sticky top-0 z-10 border-slate-200 border-b bg-white/80 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
 				<div className="container mx-auto px-4">
-					<div className="flex items-center justify-between h-16">
+					<div className="flex h-16 items-center justify-between">
 						<div className="flex items-center space-x-8">
-							<h1 className="text-xl font-bold text-slate-900 dark:text-white">LiteClient</h1>
-							<nav className="hidden md:flex items-center space-x-6">
-								<Link href="/" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Dashboard</Link>
-								<Link href="/admin/customers" className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Customers</Link>
-								<Link href="/admin/budgets" className="text-sm font-medium text-primary">Budgets</Link>
+							<h1 className="font-bold text-slate-900 text-xl dark:text-white">
+								LiteClient
+							</h1>
+							<nav className="hidden items-center space-x-6 md:flex">
+								<Link
+									href="/"
+									className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+								>
+									Dashboard
+								</Link>
+								<Link
+									href="/admin/customers"
+									className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+								>
+									Customers
+								</Link>
+								<Link
+									href="/admin/budgets"
+									className="font-medium text-primary text-sm"
+								>
+									Budgets
+								</Link>
 							</nav>
 						</div>
 						<div className="flex items-center space-x-4">
-							<button 
+							<button
+								type="button"
 								onClick={() => signOut()}
-								className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+								className="font-medium text-red-500 text-sm transition-colors hover:text-red-600"
 							>
 								Sign Out
 							</button>
@@ -75,66 +113,119 @@ const BudgetsPage: NextPage = () => {
 					</div>
 				</div>
 			</header>
-			
+
 			<main className="flex-grow">
 				<div className="container mx-auto px-4 py-8">
-					<div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+					<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
 						<div>
-							<h2 className="text-3xl font-bold text-slate-900 dark:text-white">Budgets</h2>
-							<p className="mt-1 text-slate-600 dark:text-slate-400">Manage budget limits and spending controls</p>
+							<h2 className="font-bold text-3xl text-slate-900 dark:text-white">
+								Budgets
+							</h2>
+							<p className="mt-1 text-slate-600 dark:text-slate-400">
+								Manage budget limits and spending controls
+							</p>
 						</div>
 						<Link
 							href="/admin/budgets/new"
-							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 md:mt-0"
+							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0"
 						>
-							<span className="material-symbols-outlined text-base">add</span>
-							Create Budget
+							<span className="material-symbols-outlined text-base">
+								Create
+							</span>
+							Budget
 						</Link>
 					</div>
 
 					{/* Budget Stats */}
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-						<div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+					<div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+						<div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
 							<div className="flex items-center justify-between">
 								<div>
-									<p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Budgets</p>
-									<p className="text-2xl font-bold text-slate-900 dark:text-white">{budgetList.length}</p>
-								</div>
-								<div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-									<svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-									</svg>
-								</div>
-							</div>
-						</div>
-
-						<div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Allocated</p>
-									<p className="text-2xl font-bold text-slate-900 dark:text-white">
-										${budgetList.reduce((sum, budget) => sum + budget.max_budget, 0).toFixed(2)}
+									<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
+										Total Budgets
+									</p>
+									<p className="font-bold text-2xl text-slate-900 dark:text-white">
+										{budgetList.length}
 									</p>
 								</div>
-								<div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-									<svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+								<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/20">
+									<svg
+										className="h-6 w-6 text-blue-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										role="img"
+									>
+										<title>Total Budgets Icon</title>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+										/>
 									</svg>
 								</div>
 							</div>
 						</div>
 
-						<div className="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
+						<div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
 							<div className="flex items-center justify-between">
 								<div>
-									<p className="text-sm font-medium text-slate-600 dark:text-slate-400">Assigned Customers</p>
-									<p className="text-2xl font-bold text-slate-900 dark:text-white">
+									<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
+										Total Allocated
+									</p>
+									<p className="font-bold text-2xl text-slate-900 dark:text-white">
+										$
+										{budgetList
+											.reduce((sum, budget) => sum + budget.max_budget, 0)
+											.toFixed(2)}
+									</p>
+								</div>
+								<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/20">
+									<svg
+										className="h-6 w-6 text-green-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										role="img"
+									>
+										<title>Total Allocated Icon</title>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+										/>
+									</svg>
+								</div>
+							</div>
+						</div>
+
+						<div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+							<div className="flex items-center justify-between">
+								<div>
+									<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
+										Assigned Customers
+									</p>
+									<p className="font-bold text-2xl text-slate-900 dark:text-white">
 										{totalAssignedCustomers}
 									</p>
 								</div>
-								<div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
-									<svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+								<div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/20">
+									<svg
+										className="h-6 w-6 text-purple-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										role="img"
+									>
+										<title>Total Spent Icon</title>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+										/>
 									</svg>
 								</div>
 							</div>
@@ -142,25 +233,42 @@ const BudgetsPage: NextPage = () => {
 					</div>
 
 					{/* Budgets Table */}
-					<div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-						<div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-							<h3 className="text-lg font-semibold text-slate-900 dark:text-white">Budget Overview</h3>
+					<div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+						<div className="border-slate-200 border-b px-6 py-4 dark:border-slate-700">
+							<h3 className="font-semibold text-lg text-slate-900 dark:text-white">
+								Budget Overview
+							</h3>
 						</div>
 						<div className="overflow-x-auto">
-							<table className="w-full text-sm text-left">
-								<thead className="text-xs text-slate-600 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800">
+							<table className="w-full text-left text-sm">
+								<thead className="bg-slate-50 text-slate-600 text-xs uppercase dark:bg-slate-800 dark:text-slate-400">
 									<tr>
-										<th className="px-6 py-3" scope="col">Budget ID</th>
-										<th className="px-6 py-3" scope="col">Max Budget</th>
-										<th className="px-6 py-3" scope="col">Currency</th>
-										<th className="px-6 py-3" scope="col">Reset Interval</th>
-										<th className="px-6 py-3" scope="col">Customers</th>
-										<th className="px-6 py-3" scope="col">Created</th>
+										<th className="px-6 py-3" scope="col">
+											Budget ID
+										</th>
+										<th className="px-6 py-3" scope="col">
+											Max Budget
+										</th>
+										<th className="px-6 py-3" scope="col">
+											Currency
+										</th>
+										<th className="px-6 py-3" scope="col">
+											Reset Interval
+										</th>
+										<th className="px-6 py-3" scope="col">
+											Customers
+										</th>
+										<th className="px-6 py-3" scope="col">
+											Created
+										</th>
 									</tr>
 								</thead>
 								<tbody>
 									{budgetList.map((budget) => (
-										<tr key={budget.budget_id} className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+										<tr
+											key={budget.budget_id}
+											className="border-slate-200 border-b transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+										>
 											<td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
 												{budget.budget_id}
 											</td>
@@ -171,8 +279,8 @@ const BudgetsPage: NextPage = () => {
 												USD
 											</td>
 											<td className="px-6 py-4">
-												<span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-500/20 text-blue-400 capitalize">
-													{budget.budget_duration || 'No limit'}
+												<span className="rounded-full bg-blue-500/20 px-2 py-1 font-medium text-blue-400 text-xs capitalize">
+													{budget.budget_duration || "No limit"}
 												</span>
 											</td>
 											<td className="px-6 py-4 text-slate-600 dark:text-slate-400">
@@ -190,17 +298,49 @@ const BudgetsPage: NextPage = () => {
 
 					{/* Empty State (if no budgets) */}
 					{budgetList.length === 0 && (
-						<div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-12 text-center">
-							<div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center mx-auto mb-4">
-								<svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+						<div className="rounded-xl border border-slate-200 bg-white p-12 text-center dark:border-slate-700 dark:bg-slate-900">
+							<div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
+								<svg
+									className="h-8 w-8 text-slate-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									role="img"
+								>
+									<title>No Budgets Icon</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									/>
 								</svg>
 							</div>
-							<h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No budgets found</h3>
-							<p className="text-slate-600 dark:text-slate-400 mb-6">Get started by creating your first budget to manage customer spending limits.</p>
-							<Link href="/admin/budgets/new" className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-								<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+							<h3 className="mb-2 font-semibold text-lg text-slate-900 dark:text-white">
+								No budgets found
+							</h3>
+							<p className="mb-6 text-slate-600 dark:text-slate-400">
+								Get started by creating your first budget to manage customer
+								spending limits.
+							</p>
+							<Link
+								href="/admin/budgets/new"
+								className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90"
+							>
+								<svg
+									className="h-4 w-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									role="img"
+								>
+									<title>Add Budget Icon</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+									/>
 								</svg>
 								Create Your First Budget
 							</Link>

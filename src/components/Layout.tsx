@@ -1,15 +1,17 @@
-import { useRouter } from "next/router";
-import Link from "next/link";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import type { PropsWithChildren } from "react";
 
 export const Layout = ({ children }: PropsWithChildren) => {
-  const router = useRouter();
-  const { data: session } = useSession();
+	const router = useRouter();
+	const { data: session } = useSession();
 
-  const isActive = (path: string) => {
-    return router.pathname.startsWith(path) ? 'bg-primary/10 text-primary' : 'text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5';
-  };
+	const isActive = (path: string) => {
+		return router.pathname.startsWith(path)
+			? "bg-primary/10 text-primary"
+			: "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5";
+	};
 	return (
 		<div className="relative flex h-auto min-h-screen w-full">
 			<aside className="flex w-64 flex-col border-black/10 border-r bg-white dark:border-white/10 dark:bg-background-dark">
@@ -37,37 +39,37 @@ export const Layout = ({ children }: PropsWithChildren) => {
 				<nav className="flex-1 space-y-2 p-4">
 					<Link
 						href="/"
-						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive('/')}`}
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/")}`}
 					>
-						<span className="material-symbols-outlined"></span>
+						<span className="material-symbols-outlined" />
 						<span>Dashboard</span>
 					</Link>
 					<Link
 						href="/admin/customers"
-						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive('/admin/customers')}`}
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/customers")}`}
 					>
-						<span className="material-symbols-outlined"></span>
+						<span className="material-symbols-outlined" />
 						<span>Customers</span>
 					</Link>
 					<Link
 						href="/admin/budgets"
-						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive('/admin/budgets')}`}
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/budgets")}`}
 					>
-						<span className="material-symbols-outlined"></span>
+						<span className="material-symbols-outlined" />
 						<span>Budgets</span>
 					</Link>
 					<Link
 						href="/admin/reports"
-						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive('/admin/reports')}`}
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/reports")}`}
 					>
-						<span className="material-symbols-outlined"></span>
+						<span className="material-symbols-outlined" />
 						<span>Reports</span>
 					</Link>
 					<Link
 						href="/admin/settings"
-						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive('/admin/settings')}`}
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/settings")}`}
 					>
-						<span className="material-symbols-outlined"></span>
+						<span className="material-symbols-outlined" />
 						<span>Settings</span>
 					</Link>
 				</nav>
@@ -82,10 +84,10 @@ export const Layout = ({ children }: PropsWithChildren) => {
 						</div>
 						<div>
 							<p className="font-medium text-black text-sm dark:text-white">
-								{session?.user?.name || 'User'}
+								{session?.user?.name || "User"}
 							</p>
 							<p className="text-black/60 text-xs dark:text-white/60">
-								{session?.user?.email || 'No email'}
+								{session?.user?.email || "No email"}
 							</p>
 						</div>
 					</div>

@@ -1,6 +1,9 @@
 import { Spinner } from "@/components/Spinner";
 import { api } from "@/utils/api";
-import { getFormattedCreationDate, setCustomerTimestamp } from "@/utils/customerTimestamps";
+import {
+	getFormattedCreationDate,
+	setCustomerTimestamp,
+} from "@/utils/customerTimestamps";
 import type { NextPage } from "next";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -19,14 +22,17 @@ const CustomersPage: NextPage = () => {
 	// Filter customers based on search term and status
 	const filteredCustomers = useMemo(() => {
 		if (!customers) return [];
-		
+
 		return customers.filter((customer) => {
-			const matchesSearch = customer.user_id.toLowerCase().includes(searchTerm.toLowerCase());
-			
-			const matchesStatus = statusFilter === "All Status" || 
+			const matchesSearch = customer.user_id
+				.toLowerCase()
+				.includes(searchTerm.toLowerCase());
+
+			const matchesStatus =
+				statusFilter === "All Status" ||
 				(statusFilter === "Active" && customer.spend > 0) ||
 				(statusFilter === "Inactive" && customer.spend === 0);
-			
+
 			return matchesSearch && matchesStatus;
 		});
 	}, [customers, searchTerm, statusFilter]);
@@ -34,18 +40,17 @@ const CustomersPage: NextPage = () => {
 	// Track new customers in local storage
 	useEffect(() => {
 		if (!customers) return;
-		
+
 		// For each customer, if they don't have a timestamp yet, set one
-		customers.forEach(customer => {
+		for (const customer of customers) {
 			setCustomerTimestamp(customer.user_id);
-		});
+		}
 	}, [customers]);
-	
+
 	// Get creation date for display
-	const getCreationDate = (customer: any) => {
+	const getCreationDate = (customer: { user_id: string }) => {
 		return getFormattedCreationDate(customer.user_id);
 	};
-
 
 	if (isLoading) {
 		return (
@@ -69,13 +74,11 @@ const CustomersPage: NextPage = () => {
 				<div className="container mx-auto px-4">
 					<div className="flex h-16 items-center justify-between">
 						<div className="flex items-center space-x-8">
-							<h1 className="font-bold text-white text-xl">
-								LiteClient
-							</h1>
+							<h1 className="font-bold text-white text-xl">LiteClient</h1>
 							<nav className="hidden items-center space-x-6 md:flex">
 								<Link
 									href="/"
-									className="font-medium text-white/60 text-sm transition-colors hover:text-white"
+									className="font-medium text-sm text-white/60 transition-colors hover:text-white"
 								>
 									Dashboard
 								</Link>
@@ -87,7 +90,7 @@ const CustomersPage: NextPage = () => {
 								</Link>
 								<Link
 									href="/admin/budgets"
-									className="font-medium text-white/60 text-sm transition-colors hover:text-white"
+									className="font-medium text-sm text-white/60 transition-colors hover:text-white"
 								>
 									Budgets
 								</Link>
@@ -109,9 +112,7 @@ const CustomersPage: NextPage = () => {
 				<div className="container mx-auto px-4 py-8">
 					<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
 						<div>
-							<h2 className="font-bold text-3xl text-white">
-								Customers
-							</h2>
+							<h2 className="font-bold text-3xl text-white">Customers</h2>
 							<p className="mt-1 text-white/60">
 								Manage and monitor your customer accounts
 							</p>
@@ -120,16 +121,14 @@ const CustomersPage: NextPage = () => {
 							href="/admin/customers/new"
 							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0"
 						>
-							<span className="material-symbols-outlined text-base"></span>
+							<span className="material-symbols-outlined text-base" />
 							Add Customer
 						</Link>
 					</div>
 					<div className="mb-6 space-y-4 md:flex md:items-center md:justify-between md:space-y-0">
 						<div className="relative flex-1 md:max-w-xs">
 							<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-								<span className="material-symbols-outlined text-white/40">
-									
-								</span>
+								<span className="material-symbols-outlined text-white/40" />
 							</div>
 							<input
 								className="w-full rounded-lg border-2 border-white/30 bg-background-dark py-2 pr-4 pl-10 text-white transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto"
@@ -151,12 +150,10 @@ const CustomersPage: NextPage = () => {
 									<option>Inactive</option>
 								</select>
 								<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-									<span className="material-symbols-outlined text-sm">
-										
-									</span>
+									<span className="material-symbols-outlined text-sm" />
 								</div>
 							</div>
-							<p className="text-white/60 text-sm">
+							<p className="text-sm text-white/60">
 								{filteredCustomers.length} customers found
 							</p>
 						</div>
@@ -174,7 +171,10 @@ const CustomersPage: NextPage = () => {
 									<th className="hidden px-6 py-3 lg:table-cell" scope="col">
 										Created
 									</th>
-									<th className="px-6 py-3 text-right text-white/60" scope="col">
+									<th
+										className="px-6 py-3 text-right text-white/60"
+										scope="col"
+									>
 										Actions
 									</th>
 								</tr>
@@ -193,9 +193,9 @@ const CustomersPage: NextPage = () => {
 												className="whitespace-nowrap px-6 py-4 font-medium"
 												scope="row"
 											>
-												<Link 
+												<Link
 													href={`/admin/customers/${customer.user_id}`}
-													className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+													className="flex items-center gap-3 transition-opacity hover:opacity-80"
 												>
 													<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 font-bold text-primary text-sm">
 														{customer.user_id.substring(0, 2).toUpperCase()}

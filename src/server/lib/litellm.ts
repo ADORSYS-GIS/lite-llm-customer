@@ -123,17 +123,17 @@ export async function listCustomersDetailed() {
 		// First get the basic customer list and budget list
 		const [listResponse, budgetResponse] = await Promise.all([
 			litellmClient.get("/customer/list"),
-			litellmClient.get("/budget/list")
+			litellmClient.get("/budget/list"),
 		]);
-		
+
 		// Create a map of budget_id to budget creation date
 		const budgetCreationDates: Record<string, string> = {};
-		budgetResponse.data.forEach((budget: any) => {
+		for (const budget of budgetResponse.data) {
 			if (budget.budget_id && budget.created_at) {
 				budgetCreationDates[budget.budget_id] = budget.created_at;
 			}
-		});
-		
+		}
+
 		// Then fetch detailed info for each customer
 		const detailedCustomers = await Promise.all(
 			listResponse.data.map(async (customer: { user_id: string }) => {
@@ -142,16 +142,19 @@ export async function listCustomersDetailed() {
 						params: { end_user_id: customer.user_id },
 					});
 					const info = infoResponse.data;
-					
+
 					// Enhance budget table with creation date if available
 					let enhancedBudgetTable = info.litellm_budget_table;
-					if (enhancedBudgetTable?.budget_id && budgetCreationDates[enhancedBudgetTable.budget_id]) {
+					if (
+						enhancedBudgetTable?.budget_id &&
+						budgetCreationDates[enhancedBudgetTable.budget_id]
+					) {
 						enhancedBudgetTable = {
 							...enhancedBudgetTable,
-							created_at: budgetCreationDates[enhancedBudgetTable.budget_id]
+							created_at: budgetCreationDates[enhancedBudgetTable.budget_id],
 						};
 					}
-					
+
 					return {
 						user_id: info.user_id,
 						email: info.email ?? null,
@@ -163,7 +166,10 @@ export async function listCustomersDetailed() {
 					};
 				} catch (error) {
 					// If individual customer info fails, return basic info
-					console.warn(`Failed to get detailed info for customer ${customer.user_id}:`, error);
+					console.warn(
+						`Failed to get detailed info for customer ${customer.user_id}:`,
+						error,
+					);
 					return {
 						user_id: customer.user_id,
 						email: null,
@@ -174,16 +180,17 @@ export async function listCustomersDetailed() {
 						litellm_budget_table: null,
 					};
 				}
-			})
+			}),
 		);
-		
+
 		return detailedCustomers;
 	} catch (error) {
 		if (isAxiosError(error)) {
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
 				message:
-					error.response?.data?.error?.message ?? "Failed to list customers with details.",
+					error.response?.data?.error?.message ??
+					"Failed to list customers with details.",
 				cause: error,
 			});
 		}
@@ -233,7 +240,7 @@ export async function getCustomerInfo(endUserId: string) {
 			});
 		}
 		// Check if it's a Zod validation error
-		if (error instanceof Error && error.message.includes('ZodError')) {
+		if (error instanceof Error && error.message.includes("ZodError")) {
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
 				message: `Data validation failed for customer ${endUserId}: ${error.message}`,
@@ -242,7 +249,7 @@ export async function getCustomerInfo(endUserId: string) {
 		}
 		throw new TRPCError({
 			code: "INTERNAL_SERVER_ERROR",
-			message: `Failed to get customer info for ${endUserId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+			message: `Failed to get customer info for ${endUserId}: ${error instanceof Error ? error.message : "Unknown error"}`,
 			cause: error,
 		});
 	}
@@ -332,7 +339,7 @@ export async function listBudgets() {
 		}
 		throw new TRPCError({
 			code: "INTERNAL_SERVER_ERROR",
-			message: `Failed to list budgets: ${error instanceof Error ? error.message : 'Unknown error'}`,
+			message: `Failed to list budgets: ${error instanceof Error ? error.message : "Unknown error"}`,
 			cause: error,
 		});
 	}

@@ -72,7 +72,12 @@ describe("budgetRouter", () => {
 
 		it("throws when wrapper data invalid", async () => {
 			mockedListCustomers.mockResolvedValueOnce([
-				{ user_id: 123, email: null, spend: 10, max_budget: null } as unknown as {
+				{
+					user_id: 123,
+					email: null,
+					spend: 10,
+					max_budget: null,
+				} as unknown as {
 					user_id: string;
 					email: string | null;
 					spend: number;

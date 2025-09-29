@@ -2,8 +2,8 @@ import { Layout } from "@/components/Layout";
 import { Spinner } from "@/components/Spinner";
 import { api } from "@/utils/api";
 import type { NextPage } from "next";
-import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const CustomerDetailPage: NextPage = () => {
 	const router = useRouter();
@@ -47,6 +47,7 @@ const CustomerDetailPage: NextPage = () => {
 							strokeWidth="2"
 							viewBox="0 0 24 24"
 							xmlns="http://www.w3.org/2000/svg"
+							role="img"
 						>
 							<title>LiteLLM Logo</title>
 							<path d="M12 2L2 7l10 5 10-5-10-5z" />
@@ -54,9 +55,7 @@ const CustomerDetailPage: NextPage = () => {
 							<path d="M2 12l10 5 10-5" />
 						</svg>
 					</div>
-					<h2 className="font-bold text-white text-lg">
-						LiteClient
-					</h2>
+					<h2 className="font-bold text-lg text-white">LiteClient</h2>
 				</div>
 				<nav className="flex-1 space-y-2 p-4">
 					<a
@@ -77,24 +76,21 @@ const CustomerDetailPage: NextPage = () => {
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/admin/budgets"
 					>
-						<span className="material-symbols-outlined">
-							{" "}
-							{" "}
-						</span>
+						<span className="material-symbols-outlined"> </span>
 						<span>Budgets</span>
 					</a>
 					<a
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined">  </span>
+						<span className="material-symbols-outlined"> </span>
 						<span>Reports</span>
 					</a>
 					<a
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined">  </span>
+						<span className="material-symbols-outlined"> </span>
 						<span>Settings</span>
 					</a>
 				</nav>
@@ -108,9 +104,7 @@ const CustomerDetailPage: NextPage = () => {
 							/>
 						</div>
 						<div>
-							<p className="font-medium text-white text-sm">
-								Admin User
-							</p>
+							<p className="font-medium text-sm text-white">Admin User</p>
 							<p className="text-white/60 text-xs">
 								{session?.user?.email || "admin@example.com"}
 							</p>
@@ -128,17 +122,13 @@ const CustomerDetailPage: NextPage = () => {
 					<div className="space-y-6">
 						<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-background-dark">
-								<h3 className="font-medium text-white text-lg">
-									Spend
-								</h3>
+								<h3 className="font-medium text-lg text-white">Spend</h3>
 								<p className="mt-2 font-bold text-3xl text-white">
 									${customer.spend.toFixed(2)}
 								</p>
 							</div>
 							<div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-background-dark">
-								<h3 className="font-medium text-white text-lg">
-									Max Budget
-								</h3>
+								<h3 className="font-medium text-lg text-white">Max Budget</h3>
 								<p className="mt-2 font-bold text-3xl text-white">
 									$
 									{customer.max_budget ? customer.max_budget.toFixed(2) : "N/A"}
@@ -146,9 +136,7 @@ const CustomerDetailPage: NextPage = () => {
 							</div>
 						</div>
 						<div>
-							<h3 className="font-medium text-white text-lg">
-								Budgets
-							</h3>
+							<h3 className="font-medium text-lg text-white">Budgets</h3>
 							<div className="mt-4 overflow-x-auto rounded-lg border border-black/10 bg-white dark:border-white/10 dark:bg-background-dark">
 								<table className="min-w-full table-auto">
 									<thead className="border-black/10 border-b dark:border-white/10">
@@ -167,13 +155,13 @@ const CustomerDetailPage: NextPage = () => {
 									<tbody className="divide-y divide-black/10 dark:divide-white/10">
 										{customer.budgets.map((budget) => (
 											<tr key={budget.budget_id}>
-												<td className="whitespace-nowrap px-6 py-4 font-medium text-white text-sm">
+												<td className="whitespace-nowrap px-6 py-4 font-medium text-sm text-white">
 													{budget.budget_id}
 												</td>
-												<td className="whitespace-nowrap px-6 py-4 text-white/60 text-sm">
+												<td className="whitespace-nowrap px-6 py-4 text-sm text-white/60">
 													${budget.spend.toFixed(2)}
 												</td>
-												<td className="whitespace-nowrap px-6 py-4 text-white/60 text-sm">
+												<td className="whitespace-nowrap px-6 py-4 text-sm text-white/60">
 													$
 													{budget.max_budget
 														? budget.max_budget.toFixed(2)

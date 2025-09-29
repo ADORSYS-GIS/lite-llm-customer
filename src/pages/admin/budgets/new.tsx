@@ -13,10 +13,10 @@ type CreateBudgetForm = {
 const CreateBudgetPage: NextPage = () => {
 	const router = useRouter();
 	const { register, handleSubmit } = useForm<CreateBudgetForm>({
-	defaultValues: {
-		budget_duration: 'monthly'
-	}
-});
+		defaultValues: {
+			budget_duration: "monthly",
+		},
+	});
 	const createBudget = api.budget.createBudget.useMutation();
 
 	const onSubmit = (data: CreateBudgetForm) => {
@@ -40,7 +40,7 @@ const CreateBudgetPage: NextPage = () => {
 					<div>
 						<label
 							htmlFor="budget_id"
-							className="block font-medium text-white text-sm"
+							className="block font-medium text-sm text-white"
 						>
 							Budget ID
 						</label>
@@ -48,14 +48,14 @@ const CreateBudgetPage: NextPage = () => {
 							<input
 								id="budget_id"
 								{...register("budget_id", { required: true })}
-								className="w-full rounded-lg border-white/10 bg-background-dark py-2 pr-4 pl-4 text-white text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2"
+								className="w-full rounded-lg border-white/10 bg-background-dark py-2 pr-4 pl-4 text-sm text-white ring-primary/50 transition-all focus:border-primary focus:ring-2"
 							/>
 						</div>
 					</div>
 					<div>
 						<label
 							htmlFor="max_budget"
-							className="block font-medium text-white text-sm"
+							className="block font-medium text-sm text-white"
 						>
 							Max Budget
 						</label>
@@ -67,33 +67,35 @@ const CreateBudgetPage: NextPage = () => {
 									required: true,
 									valueAsNumber: true,
 								})}
-								className="w-full rounded-lg border-white/10 bg-background-dark py-2 pr-4 pl-4 text-white text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2"
+								className="w-full rounded-lg border-white/10 bg-background-dark py-2 pr-4 pl-4 text-sm text-white ring-primary/50 transition-all focus:border-primary focus:ring-2"
 							/>
 						</div>
 					</div>
 					<div>
 						<label
 							htmlFor="budget_duration"
-							className="block font-medium text-white text-sm"
+							className="block font-medium text-sm text-white"
 						>
 							Reset Interval
 						</label>
 						<select
 							id="budget_duration"
 							{...register("budget_duration")}
-							className="mt-1 block w-full rounded-lg border-white/10 bg-background-dark py-2 pl-3 pr-10 text-white text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2"
+							className="mt-1 block w-full rounded-lg border-white/10 bg-background-dark py-2 pr-10 pl-3 text-sm text-white ring-primary/50 transition-all focus:border-primary focus:ring-2"
 						>
 							<option value="">Never (one-time budget)</option>
 							<option value="daily">Daily</option>
 							<option value="weekly">Weekly</option>
-							<option value="monthly" selected>Monthly</option>
+							<option value="monthly" selected>
+								Monthly
+							</option>
 							<option value="quarterly">Quarterly</option>
 							<option value="yearly">Yearly</option>
 						</select>
 					</div>
 					<button
 						type="submit"
-						className="flex items-center gap-2 rounded-lg border border-white/10 bg-background-dark px-4 py-2 font-medium text-white text-sm transition-colors hover:bg-white/5"
+						className="flex items-center gap-2 rounded-lg border border-white/10 bg-background-dark px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-white/5"
 						disabled={createBudget.isPending}
 					>
 						{createBudget.isPending ? "Creating..." : "Create Budget"}
