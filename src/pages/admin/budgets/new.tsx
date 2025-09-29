@@ -7,8 +7,6 @@ import { useForm } from "react-hook-form";
 type CreateBudgetForm = {
 	budget_id: string;
 	max_budget: number;
-	currency: string;
-	reset_interval: string;
 };
 
 const CreateBudgetPage: NextPage = () => {
@@ -19,7 +17,10 @@ const CreateBudgetPage: NextPage = () => {
 	const onSubmit = (data: CreateBudgetForm) => {
 		createBudget.mutate(data, {
 			onSuccess: () => {
-				router.push("/admin/customers");
+				router.push("/admin/budgets");
+			},
+			onError: (error) => {
+				console.error("Failed to create budget:", error);
 			},
 		});
 	};
@@ -27,14 +28,14 @@ const CreateBudgetPage: NextPage = () => {
 	return (
 		<Layout>
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<h1 className="font-bold text-3xl text-black tracking-tight dark:text-white">
+				<h1 className="font-bold text-3xl text-white tracking-tight">
 					Create Budget
 				</h1>
 				<form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
 					<div>
 						<label
 							htmlFor="budget_id"
-							className="block font-medium text-gray-700 text-sm dark:text-gray-200"
+							className="block font-medium text-white text-sm"
 						>
 							Budget ID
 						</label>
@@ -42,14 +43,14 @@ const CreateBudgetPage: NextPage = () => {
 							<input
 								id="budget_id"
 								{...register("budget_id", { required: true })}
-								className="w-full rounded-lg border-black/10 bg-white py-2 pr-4 pl-4 text-black text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2 dark:border-white/10 dark:bg-background-dark dark:text-white dark:focus:border-primary"
+								className="w-full rounded-lg border-white/10 bg-background-dark py-2 pr-4 pl-4 text-white text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2"
 							/>
 						</div>
 					</div>
 					<div>
 						<label
 							htmlFor="max_budget"
-							className="block font-medium text-gray-700 text-sm dark:text-gray-200"
+							className="block font-medium text-white text-sm"
 						>
 							Max Budget
 						</label>
@@ -61,43 +62,13 @@ const CreateBudgetPage: NextPage = () => {
 									required: true,
 									valueAsNumber: true,
 								})}
-								className="w-full rounded-lg border-black/10 bg-white py-2 pr-4 pl-4 text-black text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2 dark:border-white/10 dark:bg-background-dark dark:text-white dark:focus:border-primary"
-							/>
-						</div>
-					</div>
-					<div>
-						<label
-							htmlFor="currency"
-							className="block font-medium text-gray-700 text-sm dark:text-gray-200"
-						>
-							Currency
-						</label>
-						<div className="mt-1">
-							<input
-								id="currency"
-								{...register("currency", { required: true })}
-								className="w-full rounded-lg border-black/10 bg-white py-2 pr-4 pl-4 text-black text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2 dark:border-white/10 dark:bg-background-dark dark:text-white dark:focus:border-primary"
-							/>
-						</div>
-					</div>
-					<div>
-						<label
-							htmlFor="reset_interval"
-							className="block font-medium text-gray-700 text-sm dark:text-gray-200"
-						>
-							Reset Interval
-						</label>
-						<div className="mt-1">
-							<input
-								id="reset_interval"
-								{...register("reset_interval", { required: true })}
-								className="w-full rounded-lg border-black/10 bg-white py-2 pr-4 pl-4 text-black text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2 dark:border-white/10 dark:bg-background-dark dark:text-white dark:focus:border-primary"
+								className="w-full rounded-lg border-white/10 bg-background-dark py-2 pr-4 pl-4 text-white text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2"
 							/>
 						</div>
 					</div>
 					<button
 						type="submit"
-						className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-4 py-2 font-medium text-black text-sm transition-colors hover:bg-black/5 dark:border-white/10 dark:bg-background-dark dark:text-white dark:hover:bg-white/5"
+						className="flex items-center gap-2 rounded-lg border border-white/10 bg-background-dark px-4 py-2 font-medium text-white text-sm transition-colors hover:bg-white/5"
 						disabled={createBudget.isPending}
 					>
 						{createBudget.isPending ? "Creating..." : "Create Budget"}
