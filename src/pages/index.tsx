@@ -5,6 +5,7 @@ import Link from "next/link";
 export default function AdminDashboard() {
 	const { data: session } = useSession();
 	const { data: customers } = api.budget.listCustomersDetailed.useQuery();
+	const { data: healthStatus } = api.system.health.useQuery();
 
 	// Calculate stats
 	const totalCustomers = customers?.length || 0;
@@ -306,44 +307,26 @@ export default function AdminDashboard() {
 						<div className="space-y-4">
 							<div className="flex items-center justify-between">
 								<div className="flex items-center">
-									<div className="mr-3 h-3 w-3 rounded-full bg-green-500" />
+									<div
+										className={`mr-3 h-3 w-3 rounded-full ${
+											healthStatus?.status === "Online"
+												? "bg-green-500"
+												: "bg-red-500"
+										}`}
+									/>
 									<span className="text-slate-900 dark:text-white">
 										LiteLLM Proxy
 									</span>
 								</div>
-								<span className="font-medium text-green-500 text-sm">
-									Online
+								<span
+									className={`font-medium text-sm ${
+										healthStatus?.status === "Online"
+											? "text-green-500"
+											: "text-red-500"
+									}`}
+								>
+									{healthStatus?.status ?? "Loading..."}
 								</span>
-							</div>
-
-							<div className="flex items-center justify-between">
-								<div className="flex items-center">
-									<div className="mr-3 h-3 w-3 rounded-full bg-green-500" />
-									<span className="text-slate-900 dark:text-white">
-										Ollama Service
-									</span>
-								</div>
-								<span className="font-medium text-green-500 text-sm">
-									Online
-								</span>
-							</div>
-
-							<div className="flex items-center justify-between">
-								<div className="flex items-center">
-									<div className="mr-3 h-3 w-3 rounded-full bg-green-500" />
-									<span className="text-slate-900 dark:text-white">
-										Database
-									</span>
-								</div>
-								<span className="font-medium text-green-500 text-sm">
-									Connected
-								</span>
-							</div>
-
-							<div className="border-slate-200 border-t pt-4 dark:border-slate-700">
-								<p className="text-slate-600 text-sm dark:text-slate-400">
-									Last updated: {new Date().toLocaleTimeString()}
-								</p>
 							</div>
 						</div>
 					</div>
