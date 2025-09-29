@@ -7,11 +7,16 @@ import { useForm } from "react-hook-form";
 type CreateBudgetForm = {
 	budget_id: string;
 	max_budget: number;
+	budget_duration?: string;
 };
 
 const CreateBudgetPage: NextPage = () => {
 	const router = useRouter();
-	const { register, handleSubmit } = useForm<CreateBudgetForm>();
+	const { register, handleSubmit } = useForm<CreateBudgetForm>({
+	defaultValues: {
+		budget_duration: 'monthly'
+	}
+});
 	const createBudget = api.budget.createBudget.useMutation();
 
 	const onSubmit = (data: CreateBudgetForm) => {
@@ -65,6 +70,26 @@ const CreateBudgetPage: NextPage = () => {
 								className="w-full rounded-lg border-white/10 bg-background-dark py-2 pr-4 pl-4 text-white text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2"
 							/>
 						</div>
+					</div>
+					<div>
+						<label
+							htmlFor="budget_duration"
+							className="block font-medium text-white text-sm"
+						>
+							Reset Interval
+						</label>
+						<select
+							id="budget_duration"
+							{...register("budget_duration")}
+							className="mt-1 block w-full rounded-lg border-white/10 bg-background-dark py-2 pl-3 pr-10 text-white text-sm ring-primary/50 transition-all focus:border-primary focus:ring-2"
+						>
+							<option value="">Never (one-time budget)</option>
+							<option value="daily">Daily</option>
+							<option value="weekly">Weekly</option>
+							<option value="monthly" selected>Monthly</option>
+							<option value="quarterly">Quarterly</option>
+							<option value="yearly">Yearly</option>
+						</select>
 					</div>
 					<button
 						type="submit"

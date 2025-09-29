@@ -1,9 +1,10 @@
 import { Spinner } from "@/components/Spinner";
 import { api } from "@/utils/api";
+import { getFormattedCreationDate, setCustomerTimestamp } from "@/utils/customerTimestamps";
 import type { NextPage } from "next";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const CustomersPage: NextPage = () => {
 	const [searchTerm, setSearchTerm] = useState("");
@@ -18,7 +19,7 @@ const CustomersPage: NextPage = () => {
 	// Filter customers based on search term and status
 	const filteredCustomers = useMemo(() => {
 		if (!customers) return [];
-
+		
 		return customers.filter((customer) => {
 			const matchesSearch = customer.user_id.toLowerCase().includes(searchTerm.toLowerCase());
 			
@@ -30,30 +31,21 @@ const CustomersPage: NextPage = () => {
 		});
 	}, [customers, searchTerm, statusFilter]);
 
-	// Get creation date - use real date if available, otherwise generate consistent fallback
+	// Track new customers in local storage
+	useEffect(() => {
+		if (!customers) return;
+		
+		// For each customer, if they don't have a timestamp yet, set one
+		customers.forEach(customer => {
+			setCustomerTimestamp(customer.user_id);
+		});
+	}, [customers]);
+	
+	// Get creation date for display
 	const getCreationDate = (customer: any) => {
-		if (customer.created_at) {
-			return new Date(customer.created_at).toLocaleDateString();
-		}
-		
-		// Fallback: Generate a consistent creation date based on user_id hash
-		const userId = customer.user_id;
-		let hash = 0;
-		for (let i = 0; i < userId.length; i++) {
-			const char = userId.charCodeAt(i);
-			hash = ((hash << 5) - hash) + char;
-			hash = hash & hash; // Convert to 32bit integer
-		}
-		
-		// Use hash to generate a date within the last 2 years
-		const now = new Date();
-		const twoYearsAgo = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate());
-		const timeDiff = now.getTime() - twoYearsAgo.getTime();
-		const randomTime = Math.abs(hash) % timeDiff;
-		const creationDate = new Date(twoYearsAgo.getTime() + randomTime);
-		
-		return creationDate.toLocaleDateString();
+		return getFormattedCreationDate(customer.user_id);
 	};
+
 
 	if (isLoading) {
 		return (
@@ -77,13 +69,13 @@ const CustomersPage: NextPage = () => {
 				<div className="container mx-auto px-4">
 					<div className="flex h-16 items-center justify-between">
 						<div className="flex items-center space-x-8">
-							<h1 className="font-bold text-slate-900 text-xl dark:text-white">
+							<h1 className="font-bold text-white text-xl">
 								LiteClient
 							</h1>
 							<nav className="hidden items-center space-x-6 md:flex">
 								<Link
 									href="/"
-									className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+									className="font-medium text-white/60 text-sm transition-colors hover:text-white"
 								>
 									Dashboard
 								</Link>
@@ -95,7 +87,7 @@ const CustomersPage: NextPage = () => {
 								</Link>
 								<Link
 									href="/admin/budgets"
-									className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+									className="font-medium text-white/60 text-sm transition-colors hover:text-white"
 								>
 									Budgets
 								</Link>
@@ -117,10 +109,10 @@ const CustomersPage: NextPage = () => {
 				<div className="container mx-auto px-4 py-8">
 					<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
 						<div>
-							<h2 className="font-bold text-3xl text-black dark:text-white">
+							<h2 className="font-bold text-3xl text-white">
 								Customers
 							</h2>
-							<p className="mt-1 text-black/60 dark:text-white/60">
+							<p className="mt-1 text-white/60">
 								Manage and monitor your customer accounts
 							</p>
 						</div>
@@ -135,12 +127,12 @@ const CustomersPage: NextPage = () => {
 					<div className="mb-6 space-y-4 md:flex md:items-center md:justify-between md:space-y-0">
 						<div className="relative flex-1 md:max-w-xs">
 							<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-								<span className="material-symbols-outlined text-black/40 dark:text-white/40">
+								<span className="material-symbols-outlined text-white/40">
 									
 								</span>
 							</div>
 							<input
-								className="w-full rounded-lg border border-black/10 bg-background-light py-2 pr-4 pl-10 transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto dark:border-white/10 dark:bg-background-dark"
+								className="w-full rounded-lg border-2 border-white/30 bg-background-dark py-2 pr-4 pl-10 text-white transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto"
 								placeholder="Search by email / customer ID..."
 								type="text"
 								value={searchTerm}
@@ -150,7 +142,7 @@ const CustomersPage: NextPage = () => {
 						<div className="flex items-center gap-4">
 							<div className="relative">
 								<select
-									className="w-full appearance-none rounded-lg border border-black/10 bg-background-light py-2 pr-8 pl-3 text-sm transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto dark:border-white/10 dark:bg-background-dark"
+									className="w-full appearance-none rounded-lg border-2 border-white/30 bg-background-dark py-2 pr-8 pl-3 text-sm text-white transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto"
 									value={statusFilter}
 									onChange={(e) => setStatusFilter(e.target.value)}
 								>
@@ -164,14 +156,14 @@ const CustomersPage: NextPage = () => {
 									</span>
 								</div>
 							</div>
-							<p className="text-black/60 text-sm dark:text-white/60">
+							<p className="text-white/60 text-sm">
 								{filteredCustomers.length} customers found
 							</p>
 						</div>
 					</div>
 					<div className="overflow-x-auto bg-transparent">
 						<table className="w-full text-left text-sm">
-							<thead className="text-black/60 text-xs uppercase dark:text-white/60">
+							<thead className="text-white/60 text-xs uppercase">
 								<tr>
 									<th className="px-6 py-3" scope="col">
 										Customer
@@ -182,7 +174,7 @@ const CustomersPage: NextPage = () => {
 									<th className="hidden px-6 py-3 lg:table-cell" scope="col">
 										Created
 									</th>
-									<th className="px-6 py-3 text-right" scope="col">
+									<th className="px-6 py-3 text-right text-white/60" scope="col">
 										Actions
 									</th>
 								</tr>
@@ -209,10 +201,10 @@ const CustomersPage: NextPage = () => {
 														{customer.user_id.substring(0, 2).toUpperCase()}
 													</div>
 													<div>
-														<div className="font-semibold text-base text-black dark:text-white">
+														<div className="font-semibold text-base text-white">
 															Customer {originalIndex + 1}
 														</div>
-														<div className="font-normal text-black/60 dark:text-white/60">
+														<div className="font-normal text-white/60">
 															ID: {customer.user_id}
 														</div>
 													</div>
@@ -229,7 +221,7 @@ const CustomersPage: NextPage = () => {
 													{isActive ? "Active" : "Inactive"}
 												</span>
 											</td>
-											<td className="hidden px-6 py-4 text-black/80 lg:table-cell dark:text-white/80">
+											<td className="hidden px-6 py-4 text-white/80 lg:table-cell">
 												{getCreationDate(customer)}
 											</td>
 											<td className="px-6 py-4 text-right">

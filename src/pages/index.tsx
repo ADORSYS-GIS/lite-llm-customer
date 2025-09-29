@@ -4,7 +4,7 @@ import { api } from "@/utils/api";
 
 export default function AdminDashboard() {
 	const { data: session } = useSession();
-	const { data: customers } = api.budget.listCustomers.useQuery();
+	const { data: customers } = api.budget.listCustomersDetailed.useQuery();
 
 	// Calculate stats
 	const totalCustomers = customers?.length || 0;

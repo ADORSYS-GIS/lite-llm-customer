@@ -34,6 +34,7 @@ const customerInfoSchema = z.object({
 const createBudgetInputSchema = z.object({
 	budget_id: z.string(),
 	max_budget: z.number(),
+	budget_duration: z.string().optional(),
 });
 
 const assignBudgetInputSchema = z.object({

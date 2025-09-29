@@ -27,11 +27,12 @@ const createCaller = createCallerFactory(budgetRouter);
 type RouterInputs = inferRouterInputs<typeof budgetRouter>;
 
 const adminSession: Session = {
+	expires: new Date().toISOString(),
 	user: {
+		id: "test-admin-id",
 		email: "admin@example.com",
 		name: "Admin",
 	},
-	expires: new Date().toISOString(),
 };
 
 const createAdminCaller = () =>
@@ -59,18 +60,21 @@ describe("budgetRouter", () => {
 	describe("listCustomers", () => {
 		it("returns customers", async () => {
 			mockedListCustomers.mockResolvedValueOnce([
-				{ user_id: "123", spend: 10, max_budget: null },
+				{ user_id: "123", email: null, spend: 10, max_budget: null },
 			]);
 
 			const caller = createAdminCaller();
-			const result = await caller.listCustomers();
-			expect(result).toEqual([{ user_id: "123", spend: 10, max_budget: null }]);
+			const customers = await caller.listCustomers();
+			expect(customers).toEqual([
+				{ user_id: "123", spend: 10, max_budget: null },
+			]);
 		});
 
 		it("throws when wrapper data invalid", async () => {
 			mockedListCustomers.mockResolvedValueOnce([
-				{ user_id: 123, spend: 10, max_budget: null } as unknown as {
+				{ user_id: 123, email: null, spend: 10, max_budget: null } as unknown as {
 					user_id: string;
+					email: string | null;
 					spend: number;
 					max_budget: number | null;
 				},
@@ -85,6 +89,7 @@ describe("budgetRouter", () => {
 		it("returns customer info", async () => {
 			mockedGetCustomerInfo.mockResolvedValueOnce({
 				user_id: "user-1",
+				email: null,
 				spend: 0,
 				max_budget: null,
 				budgets: [],
@@ -113,27 +118,21 @@ describe("budgetRouter", () => {
 
 	describe("createBudget", () => {
 		it("creates budget", async () => {
+			const mockInput = {
+				budget_id: "test-budget",
+				max_budget: 100,
+			};
 			mockedCreateBudget.mockResolvedValueOnce({
 				budget_id: "budget-1",
 				max_budget: 100,
 			});
 			const caller = createAdminCaller();
-			const result = await caller.createBudget({
-				budget_id: "budget-1",
-				max_budget: 100,
-				currency: "USD",
-				reset_interval: "monthly",
-			});
+			const result = await caller.createBudget(mockInput);
 			expect(result).toEqual({
 				budget_id: "budget-1",
 				max_budget: 100,
 			});
-			expect(mockedCreateBudget).toHaveBeenCalledWith({
-				budget_id: "budget-1",
-				max_budget: 100,
-				currency: "USD",
-				reset_interval: "monthly",
-			});
+			expect(mockedCreateBudget).toHaveBeenCalledWith(mockInput);
 		});
 
 		it("validates input", async () => {
@@ -148,8 +147,6 @@ describe("budgetRouter", () => {
 				caller.createBudget({
 					budget_id: "budget-1",
 					max_budget: 100,
-					currency: "USD",
-					reset_interval: "",
 				}),
 			).rejects.toBeInstanceOf(TRPCError);
 		});

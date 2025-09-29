@@ -120,8 +120,19 @@ export async function listCustomers() {
  */
 export async function listCustomersDetailed() {
 	try {
-		// First get the basic customer list
-		const listResponse = await litellmClient.get("/customer/list");
+		// First get the basic customer list and budget list
+		const [listResponse, budgetResponse] = await Promise.all([
+			litellmClient.get("/customer/list"),
+			litellmClient.get("/budget/list")
+		]);
+		
+		// Create a map of budget_id to budget creation date
+		const budgetCreationDates: Record<string, string> = {};
+		budgetResponse.data.forEach((budget: any) => {
+			if (budget.budget_id && budget.created_at) {
+				budgetCreationDates[budget.budget_id] = budget.created_at;
+			}
+		});
 		
 		// Then fetch detailed info for each customer
 		const detailedCustomers = await Promise.all(
@@ -132,6 +143,15 @@ export async function listCustomersDetailed() {
 					});
 					const info = infoResponse.data;
 					
+					// Enhance budget table with creation date if available
+					let enhancedBudgetTable = info.litellm_budget_table;
+					if (enhancedBudgetTable?.budget_id && budgetCreationDates[enhancedBudgetTable.budget_id]) {
+						enhancedBudgetTable = {
+							...enhancedBudgetTable,
+							created_at: budgetCreationDates[enhancedBudgetTable.budget_id]
+						};
+					}
+					
 					return {
 						user_id: info.user_id,
 						email: info.email ?? null,
@@ -139,7 +159,7 @@ export async function listCustomersDetailed() {
 						max_budget: info.litellm_budget_table?.max_budget ?? null,
 						created_at: info.created_at ?? null,
 						blocked: info.blocked ?? false,
-						litellm_budget_table: info.litellm_budget_table ?? null,
+						litellm_budget_table: enhancedBudgetTable,
 					};
 				} catch (error) {
 					// If individual customer info fails, return basic info

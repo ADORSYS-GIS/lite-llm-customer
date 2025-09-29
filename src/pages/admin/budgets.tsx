@@ -83,10 +83,11 @@ const BudgetsPage: NextPage = () => {
 							<h2 className="text-3xl font-bold text-slate-900 dark:text-white">Budgets</h2>
 							<p className="mt-1 text-slate-600 dark:text-slate-400">Manage budget limits and spending controls</p>
 						</div>
-						<Link href="/admin/budgets/new" className="mt-4 md:mt-0 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-							<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-							</svg>
+						<Link
+							href="/admin/budgets/new"
+							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 md:mt-0"
+						>
+							<span className="material-symbols-outlined text-base">add</span>
 							Create Budget
 						</Link>
 					</div>
@@ -155,7 +156,6 @@ const BudgetsPage: NextPage = () => {
 										<th className="px-6 py-3" scope="col">Reset Interval</th>
 										<th className="px-6 py-3" scope="col">Customers</th>
 										<th className="px-6 py-3" scope="col">Created</th>
-										<th className="px-6 py-3 text-right" scope="col">Actions</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -180,16 +180,6 @@ const BudgetsPage: NextPage = () => {
 											</td>
 											<td className="px-6 py-4 text-slate-600 dark:text-slate-400">
 												{new Date(budget.created_at).toLocaleDateString()}
-											</td>
-											<td className="px-6 py-4 text-right">
-												<div className="flex items-center justify-end space-x-2">
-													<button className="text-primary hover:text-primary/80 font-medium text-sm">
-														Edit
-													</button>
-													<button className="text-red-500 hover:text-red-600 font-medium text-sm">
-														Delete
-													</button>
-												</div>
 											</td>
 										</tr>
 									))}
