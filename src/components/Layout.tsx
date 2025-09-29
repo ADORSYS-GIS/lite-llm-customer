@@ -1,6 +1,17 @@
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import type { PropsWithChildren } from "react";
 
 export const Layout = ({ children }: PropsWithChildren) => {
+	const router = useRouter();
+	const { data: session } = useSession();
+
+	const isActive = (path: string) => {
+		return router.pathname.startsWith(path)
+			? "bg-primary/10 text-primary"
+			: "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5";
+	};
 	return (
 		<div className="relative flex h-auto min-h-screen w-full">
 			<aside className="flex w-64 flex-col border-black/10 border-r bg-white dark:border-white/10 dark:bg-background-dark">
@@ -26,44 +37,41 @@ export const Layout = ({ children }: PropsWithChildren) => {
 					</h2>
 				</div>
 				<nav className="flex-1 space-y-2 p-4">
-					<a
-						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
+					<Link
 						href="/"
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/")}`}
 					>
-						<span className="material-symbols-outlined"> dashboard </span>
+						<span className="material-symbols-outlined" />
 						<span>Dashboard</span>
-					</a>
-					<a
-						className="flex items-center gap-3 rounded-lg bg-primary/10 px-4 py-2 font-medium text-primary text-sm"
+					</Link>
+					<Link
 						href="/admin/customers"
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/customers")}`}
 					>
-						<span className="material-symbols-outlined"> group </span>
+						<span className="material-symbols-outlined" />
 						<span>Customers</span>
-					</a>
-					<a
-						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
-						href="/"
+					</Link>
+					<Link
+						href="/admin/budgets"
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/budgets")}`}
 					>
-						<span className="material-symbols-outlined">
-							{" "}
-							account_balance_wallet{" "}
-						</span>
+						<span className="material-symbols-outlined" />
 						<span>Budgets</span>
-					</a>
-					<a
-						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
-						href="/"
+					</Link>
+					<Link
+						href="/admin/reports"
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/reports")}`}
 					>
-						<span className="material-symbols-outlined"> assessment </span>
+						<span className="material-symbols-outlined" />
 						<span>Reports</span>
-					</a>
-					<a
-						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
-						href="/"
+					</Link>
+					<Link
+						href="/admin/settings"
+						className={`flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-sm transition-colors ${isActive("/admin/settings")}`}
 					>
-						<span className="material-symbols-outlined"> settings </span>
+						<span className="material-symbols-outlined" />
 						<span>Settings</span>
-					</a>
+					</Link>
 				</nav>
 				<div className="border-black/10 border-t p-4 dark:border-white/10">
 					<div className="flex items-center gap-3">
@@ -76,10 +84,10 @@ export const Layout = ({ children }: PropsWithChildren) => {
 						</div>
 						<div>
 							<p className="font-medium text-black text-sm dark:text-white">
-								Admin User
+								{session?.user?.name || "User"}
 							</p>
 							<p className="text-black/60 text-xs dark:text-white/60">
-								admin@liteclient.com
+								{session?.user?.email || "No email"}
 							</p>
 						</div>
 					</div>

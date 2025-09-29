@@ -1,6 +1,7 @@
 /**
  * @vitest-environment node
  */
+
 import { env } from "@/env";
 import { TRPCError } from "@trpc/server";
 import { http, HttpResponse } from "msw";
@@ -19,6 +20,7 @@ const server = setupServer(
 		return HttpResponse.json([
 			{
 				user_id: "123",
+				email: null,
 				spend: 100,
 				litellm_budget_table: { max_budget: 200 },
 			},
@@ -30,6 +32,7 @@ const server = setupServer(
 		if (endUserId === "123") {
 			return HttpResponse.json({
 				user_id: "123",
+				email: null,
 				spend: 100,
 				litellm_budget_table: null, // Match the implementation's expected structure
 			});
@@ -59,7 +62,7 @@ describe("LiteLLM API Wrapper", () => {
 		it("should return a list of customers on success", async () => {
 			const customers = await listCustomers();
 			expect(customers).toEqual([
-				{ user_id: "123", spend: 100, max_budget: 200 },
+				{ user_id: "123", email: null, spend: 100, max_budget: 200 },
 			]);
 		});
 
@@ -78,6 +81,7 @@ describe("LiteLLM API Wrapper", () => {
 			const info = await getCustomerInfo("123");
 			expect(info).toEqual({
 				user_id: "123",
+				email: null,
 				spend: 100,
 				max_budget: null,
 				budgets: [],
@@ -91,12 +95,11 @@ describe("LiteLLM API Wrapper", () => {
 
 	describe("createBudget", () => {
 		it("should return a success message on creation", async () => {
-			const response = await createBudget({
-				budget_id: "budget-1",
+			const mockInput = {
+				budget_id: "test-budget",
 				max_budget: 100,
-				currency: "USD",
-				reset_interval: "monthly",
-			});
+			};
+			const response = await createBudget(mockInput);
 			expect(response).toEqual({
 				budget_id: "budget-1",
 				max_budget: 100,
@@ -113,8 +116,6 @@ describe("LiteLLM API Wrapper", () => {
 				createBudget({
 					budget_id: "budget-1",
 					max_budget: 100,
-					currency: "USD",
-					reset_interval: "monthly",
 				}),
 			).rejects.toThrow(TRPCError);
 		});
