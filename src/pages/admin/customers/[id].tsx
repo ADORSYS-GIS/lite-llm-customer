@@ -3,10 +3,12 @@ import { Spinner } from "@/components/Spinner";
 import { api } from "@/utils/api";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 const CustomerDetailPage: NextPage = () => {
 	const router = useRouter();
 	const { id } = router.query;
+	const { data: session } = useSession();
 	const {
 		data: customer,
 		isLoading,
@@ -52,7 +54,7 @@ const CustomerDetailPage: NextPage = () => {
 							<path d="M2 12l10 5 10-5" />
 						</svg>
 					</div>
-					<h2 className="font-bold text-black text-lg dark:text-white">
+					<h2 className="font-bold text-white text-lg">
 						LiteClient
 					</h2>
 				</div>
@@ -61,23 +63,23 @@ const CustomerDetailPage: NextPage = () => {
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined"> dashboard </span>
+						<span className="material-symbols-outlined"> </span>
 						<span>Dashboard</span>
 					</a>
 					<a
 						className="flex items-center gap-3 rounded-lg bg-primary/10 px-4 py-2 font-medium text-primary text-sm"
 						href="/admin/customers"
 					>
-						<span className="material-symbols-outlined"> group </span>
+						<span className="material-symbols-outlined"> </span>
 						<span>Customers</span>
 					</a>
 					<a
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
-						href="/"
+						href="/admin/budgets"
 					>
 						<span className="material-symbols-outlined">
 							{" "}
-							account_balance_wallet{" "}
+							{" "}
 						</span>
 						<span>Budgets</span>
 					</a>
@@ -85,14 +87,14 @@ const CustomerDetailPage: NextPage = () => {
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined"> assessment </span>
+						<span className="material-symbols-outlined">  </span>
 						<span>Reports</span>
 					</a>
 					<a
 						className="flex items-center gap-3 rounded-lg px-4 py-2 font-medium text-black/60 text-sm transition-colors hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/5"
 						href="/"
 					>
-						<span className="material-symbols-outlined"> settings </span>
+						<span className="material-symbols-outlined">  </span>
 						<span>Settings</span>
 					</a>
 				</nav>
@@ -106,11 +108,11 @@ const CustomerDetailPage: NextPage = () => {
 							/>
 						</div>
 						<div>
-							<p className="font-medium text-black text-sm dark:text-white">
+							<p className="font-medium text-white text-sm">
 								Admin User
 							</p>
-							<p className="text-black/60 text-xs dark:text-white/60">
-								admin@liteclient.com
+							<p className="text-white/60 text-xs">
+								{session?.user?.email || "admin@example.com"}
 							</p>
 						</div>
 					</div>
@@ -119,45 +121,45 @@ const CustomerDetailPage: NextPage = () => {
 			<main className="flex-1 bg-background-light p-8 dark:bg-background-dark/80">
 				<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
 					<div className="mb-8">
-						<h1 className="font-bold text-3xl text-black tracking-tight dark:text-white">
+						<h1 className="font-bold text-3xl text-white tracking-tight">
 							{customer.user_id}
 						</h1>
 					</div>
 					<div className="space-y-6">
 						<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-background-dark">
-								<h3 className="font-medium text-black text-lg dark:text-white">
+								<h3 className="font-medium text-white text-lg">
 									Spend
 								</h3>
-								<p className="mt-2 font-bold text-3xl text-black dark:text-white">
+								<p className="mt-2 font-bold text-3xl text-white">
 									${customer.spend.toFixed(2)}
 								</p>
 							</div>
 							<div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-background-dark">
-								<h3 className="font-medium text-black text-lg dark:text-white">
+								<h3 className="font-medium text-white text-lg">
 									Max Budget
 								</h3>
-								<p className="mt-2 font-bold text-3xl text-black dark:text-white">
+								<p className="mt-2 font-bold text-3xl text-white">
 									$
 									{customer.max_budget ? customer.max_budget.toFixed(2) : "N/A"}
 								</p>
 							</div>
 						</div>
 						<div>
-							<h3 className="font-medium text-black text-lg dark:text-white">
+							<h3 className="font-medium text-white text-lg">
 								Budgets
 							</h3>
 							<div className="mt-4 overflow-x-auto rounded-lg border border-black/10 bg-white dark:border-white/10 dark:bg-background-dark">
 								<table className="min-w-full table-auto">
 									<thead className="border-black/10 border-b dark:border-white/10">
 										<tr>
-											<th className="px-6 py-3 text-left font-medium text-black/60 text-xs uppercase tracking-wider dark:text-white/60">
+											<th className="px-6 py-3 text-left font-medium text-white/60 text-xs uppercase tracking-wider">
 												Budget ID
 											</th>
-											<th className="px-6 py-3 text-left font-medium text-black/60 text-xs uppercase tracking-wider dark:text-white/60">
+											<th className="px-6 py-3 text-left font-medium text-white/60 text-xs uppercase tracking-wider">
 												Spend
 											</th>
-											<th className="px-6 py-3 text-left font-medium text-black/60 text-xs uppercase tracking-wider dark:text-white/60">
+											<th className="px-6 py-3 text-left font-medium text-white/60 text-xs uppercase tracking-wider">
 												Max Budget
 											</th>
 										</tr>
@@ -165,13 +167,13 @@ const CustomerDetailPage: NextPage = () => {
 									<tbody className="divide-y divide-black/10 dark:divide-white/10">
 										{customer.budgets.map((budget) => (
 											<tr key={budget.budget_id}>
-												<td className="whitespace-nowrap px-6 py-4 font-medium text-black text-sm dark:text-white">
+												<td className="whitespace-nowrap px-6 py-4 font-medium text-white text-sm">
 													{budget.budget_id}
 												</td>
-												<td className="whitespace-nowrap px-6 py-4 text-black/60 text-sm dark:text-white/60">
+												<td className="whitespace-nowrap px-6 py-4 text-white/60 text-sm">
 													${budget.spend.toFixed(2)}
 												</td>
-												<td className="whitespace-nowrap px-6 py-4 text-black/60 text-sm dark:text-white/60">
+												<td className="whitespace-nowrap px-6 py-4 text-white/60 text-sm">
 													$
 													{budget.max_budget
 														? budget.max_budget.toFixed(2)
