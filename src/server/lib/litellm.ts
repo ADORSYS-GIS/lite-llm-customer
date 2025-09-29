@@ -17,6 +17,7 @@ const litellmClient = axios.create({
 // Zod Schemas for API validation
 const CustomerSchema = z.object({
 	user_id: z.string(),
+	email: z.string().nullable(),
 	spend: z.number(),
 	max_budget: z.nullable(z.number()),
 });
@@ -33,11 +34,37 @@ const CustomerInfoSchema = CustomerSchema.extend({
 	),
 });
 
+const BudgetSchema = z.object({
+	budget_id: z.string(),
+	max_budget: z.number(),
+	soft_budget: z.number().nullable(),
+	max_parallel_requests: z.number().nullable(),
+	tpm_limit: z.number().nullable(),
+	rpm_limit: z.number().nullable(),
+	model_max_budget: z.any().nullable(),
+	budget_duration: z.string().nullable(),
+	budget_reset_at: z.string().nullable(),
+	created_at: z.string(),
+	created_by: z.string(),
+	updated_at: z.string(),
+	updated_by: z.string(),
+	organization: z.any().nullable(),
+	keys: z.any().nullable(),
+	end_users: z.any().nullable(),
+	team_membership: z.any().nullable(),
+	organization_membership: z.any().nullable(),
+});
+
+const BudgetListSchema = z.array(BudgetSchema);
+
 const BudgetPayloadSchema = z.object({
 	budget_id: z.string(),
 	max_budget: z.number(),
-	currency: z.string(),
-	reset_interval: z.string(),
+});
+
+const AssignBudgetPayloadSchema = z.object({
+	user_id: z.string(),
+	budget_id: z.string(),
 });
 
 const BudgetResponseSchema = z.object({
@@ -46,7 +73,7 @@ const BudgetResponseSchema = z.object({
 });
 
 /**
- * Lists all customers.
+ * Lists all customers with basic info.
  * @returns A promise that resolves to a list of customers.
  * @throws Throws an error if the API call fails or the response is invalid.
  */
@@ -56,10 +83,13 @@ export async function listCustomers() {
 		const transformedData = response.data.map(
 			(customer: {
 				user_id: string;
+				email?: string | null;
 				spend: number;
-				litellm_budget_table: { max_budget: number | null };
+				blocked: boolean;
+				litellm_budget_table: { max_budget: number | null } | null;
 			}) => ({
 				user_id: customer.user_id,
+				email: customer.email ?? null,
 				spend: customer.spend,
 				max_budget: customer.litellm_budget_table?.max_budget ?? null,
 			}),
@@ -83,6 +113,69 @@ export async function listCustomers() {
 }
 
 /**
+ * Lists all customers with detailed info including emails and creation dates.
+ * This fetches individual customer info for each customer to get complete data.
+ * @returns A promise that resolves to a list of customers with full details.
+ * @throws Throws an error if the API call fails or the response is invalid.
+ */
+export async function listCustomersDetailed() {
+	try {
+		// First get the basic customer list
+		const listResponse = await litellmClient.get("/customer/list");
+		
+		// Then fetch detailed info for each customer
+		const detailedCustomers = await Promise.all(
+			listResponse.data.map(async (customer: { user_id: string }) => {
+				try {
+					const infoResponse = await litellmClient.get("/customer/info", {
+						params: { end_user_id: customer.user_id },
+					});
+					const info = infoResponse.data;
+					
+					return {
+						user_id: info.user_id,
+						email: info.email ?? null,
+						spend: info.spend ?? 0,
+						max_budget: info.litellm_budget_table?.max_budget ?? null,
+						created_at: info.created_at ?? null,
+						blocked: info.blocked ?? false,
+						litellm_budget_table: info.litellm_budget_table ?? null,
+					};
+				} catch (error) {
+					// If individual customer info fails, return basic info
+					console.warn(`Failed to get detailed info for customer ${customer.user_id}:`, error);
+					return {
+						user_id: customer.user_id,
+						email: null,
+						spend: 0,
+						max_budget: null,
+						created_at: null,
+						blocked: false,
+						litellm_budget_table: null,
+					};
+				}
+			})
+		);
+		
+		return detailedCustomers;
+	} catch (error) {
+		if (isAxiosError(error)) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message:
+					error.response?.data?.error?.message ?? "Failed to list customers with details.",
+				cause: error,
+			});
+		}
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: "Failed to list customers with details.",
+			cause: error,
+		});
+	}
+}
+
+/**
  * Gets information for a specific customer.
  * @param endUserId The ID of the end user.
  * @returns A promise that resolves to the customer's information.
@@ -96,6 +189,7 @@ export async function getCustomerInfo(endUserId: string) {
 		const info = response.data;
 		const transformedInfo = {
 			...info,
+			email: info.email ?? null, // Ensure email field is present
 			max_budget: info.litellm_budget_table?.max_budget ?? null,
 			budgets: info.litellm_budget_table
 				? [
@@ -114,13 +208,21 @@ export async function getCustomerInfo(endUserId: string) {
 				code: "INTERNAL_SERVER_ERROR",
 				message:
 					error.response?.data?.error?.message ??
-					"Failed to get customer info.",
+					`Failed to get customer info for ${endUserId}. Status: ${error.response?.status}`,
+				cause: error,
+			});
+		}
+		// Check if it's a Zod validation error
+		if (error instanceof Error && error.message.includes('ZodError')) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: `Data validation failed for customer ${endUserId}: ${error.message}`,
 				cause: error,
 			});
 		}
 		throw new TRPCError({
 			code: "INTERNAL_SERVER_ERROR",
-			message: "Failed to get customer info.",
+			message: `Failed to get customer info for ${endUserId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			cause: error,
 		});
 	}
@@ -166,12 +268,12 @@ export async function createBudget(
  */
 export async function assignBudget(userId: string, budgetId: string) {
 	try {
-		const payload = BudgetPayloadSchema.parse({
+		const payload = AssignBudgetPayloadSchema.parse({
 			user_id: userId,
 			budget_id: budgetId,
 		});
 		const response = await litellmClient.post("/customer/new", payload);
-		return BudgetResponseSchema.parse(response.data);
+		return response.data;
 	} catch (error) {
 		if (isAxiosError(error)) {
 			throw new TRPCError({
@@ -184,6 +286,33 @@ export async function assignBudget(userId: string, budgetId: string) {
 		throw new TRPCError({
 			code: "INTERNAL_SERVER_ERROR",
 			message: "Failed to assign budget.",
+			cause: error,
+		});
+	}
+}
+
+/**
+ * Lists all budgets.
+ * @returns A promise that resolves to a list of budgets.
+ * @throws Throws a TRPCError if the API call fails or the response is invalid.
+ */
+export async function listBudgets() {
+	try {
+		const response = await litellmClient.get("/budget/list");
+		return BudgetListSchema.parse(response.data);
+	} catch (error) {
+		if (isAxiosError(error)) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message:
+					error.response?.data?.error?.message ??
+					`Failed to list budgets. Status: ${error.response?.status}`,
+				cause: error,
+			});
+		}
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: `Failed to list budgets: ${error instanceof Error ? error.message : 'Unknown error'}`,
 			cause: error,
 		});
 	}
