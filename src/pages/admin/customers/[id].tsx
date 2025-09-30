@@ -86,8 +86,8 @@ const CustomerDetailPage: NextPage = () => {
 			</header>
 
 			{/* Main Content */}
-			<main className="container mx-auto px-4 py-8">
-				<div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+			<main className="container mx-auto px-2 py-6 sm:px-4 sm:py-8">
+				<div className="mx-auto max-w-4xl px-2 sm:px-4 lg:px-8">
 					<div className="mb-8">
 						<h1 className="font-bold text-3xl text-white tracking-tight">
 							{customer.user_id}

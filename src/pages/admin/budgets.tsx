@@ -127,7 +127,7 @@ const BudgetsPage: NextPage = () => {
 						</div>
 						<Link
 							href="/admin/budgets/new"
-							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0"
+							className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0 md:w-auto"
 						>
 							<span className="material-symbols-outlined text-base">
 								Create
@@ -287,7 +287,9 @@ const BudgetsPage: NextPage = () => {
 												{getCustomerCountForBudget(budget.budget_id)}
 											</td>
 											<td className="px-6 py-4 text-slate-600 dark:text-slate-400">
-												{new Date(budget.created_at).toLocaleDateString()}
+												{budget.created_at
+													? new Date(budget.created_at).toLocaleDateString()
+													: "—"}
 											</td>
 										</tr>
 									))}

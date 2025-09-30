@@ -173,21 +173,25 @@ const NewCustomerPage: NextPage = () => {
 							)}
 
 							<div className="flex gap-4">
-								<button
-									type="submit"
-									disabled={isSubmitting || !userId.trim() || !budgetId.trim()}
-									className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-								>
-									{isSubmitting && <Spinner />}
-									{isSubmitting ? "Creating..." : "Create Customer"}
-								</button>
+								<div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+									<button
+										type="submit"
+										disabled={
+											isSubmitting || !userId.trim() || !budgetId.trim()
+										}
+										className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+									>
+										{isSubmitting && <Spinner />}
+										{isSubmitting ? "Creating..." : "Create Customer"}
+									</button>
 
-								<Link
-									href="/admin/customers"
-									className="rounded-lg border border-white/10 px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-white/5"
-								>
-									Cancel
-								</Link>
+									<Link
+										href="/admin/customers"
+										className="w-full rounded-lg border border-white/10 px-4 py-2 text-center font-medium text-sm text-white transition-colors hover:bg-white/5 sm:w-auto"
+									>
+										Cancel
+									</Link>
+								</div>
 							</div>
 						</form>
 					</div>

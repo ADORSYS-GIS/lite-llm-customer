@@ -119,7 +119,7 @@ const CustomersPage: NextPage = () => {
 						</div>
 						<Link
 							href="/admin/customers/new"
-							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0"
+							className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0 md:w-auto"
 						>
 							<span className="material-symbols-outlined text-base" />
 							Add Customer

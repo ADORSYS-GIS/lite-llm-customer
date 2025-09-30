@@ -12,7 +12,6 @@ type CreateBudgetForm = {
 };
 
 const CreateBudgetPage: NextPage = () => {
-	const { data: session } = useSession();
 	const router = useRouter();
 	const { register, handleSubmit } = useForm<CreateBudgetForm>({
 		defaultValues: {
@@ -145,27 +144,27 @@ const CreateBudgetPage: NextPage = () => {
 								<option value="">Never (one-time budget)</option>
 								<option value="daily">Daily</option>
 								<option value="weekly">Weekly</option>
-								<option value="monthly" selected>
-									Monthly
-								</option>
+								<option value="monthly">Monthly</option>
 								<option value="quarterly">Quarterly</option>
 								<option value="yearly">Yearly</option>
 							</select>
 						</div>
 						<div className="flex items-center justify-end space-x-3 pt-4">
-							<Link
-								href="/admin/budgets"
-								className="rounded-lg border border-slate-600/50 bg-transparent px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark"
-							>
-								Cancel
-							</Link>
-							<button
-								type="submit"
-								className="rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark disabled:opacity-70"
-								disabled={createBudget.isPending}
-							>
-								{createBudget.isPending ? "Creating..." : "Create Budget"}
-							</button>
+							<div className="flex w-full gap-3 sm:w-auto">
+								<Link
+									href="/admin/budgets"
+									className="flex-1 rounded-lg border border-slate-600/50 bg-transparent px-4 py-2 text-center font-medium text-sm text-white transition-colors hover:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark sm:flex-none"
+								>
+									Cancel
+								</Link>
+								<button
+									type="submit"
+									className="flex-1 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background-dark disabled:opacity-70 sm:flex-none"
+									disabled={createBudget.isPending}
+								>
+									{createBudget.isPending ? "Creating..." : "Create Budget"}
+								</button>
+							</div>
 						</div>
 					</form>
 				</div>
