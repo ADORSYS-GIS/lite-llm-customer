@@ -55,11 +55,9 @@ If you have not created a budget yet you can use the [LiteLLM + Ollama Docker Se
 
 ## 📈 Usage Tracking
 
-### Check Customer Spending
-
+### Make a request to a model
 
 ```bash
-# Make a request to a model 
 curl -X POST http://localhost:4000/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-1234" \
@@ -76,6 +74,7 @@ curl -X POST http://localhost:4000/chat/completions \
 ```
 
 
+## Check Customer Spending
 ```bash
 # Get usage for a specific customer
 curl -X GET 'http://localhost:4000/customer/info?end_user_id=<end_user_id>' \
