@@ -3,8 +3,13 @@ import { api } from "@/utils/api";
 import type { NextPage } from "next";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useMemo, useState, useEffect } from "react";
 
 const BudgetsPage: NextPage = () => {
+	// Pagination state for budgets table
+	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
+
 	const {
 		data: budgets,
 		isLoading: budgetsLoading,
@@ -21,6 +26,55 @@ const BudgetsPage: NextPage = () => {
 	const isLoading = budgetsLoading || customersLoading;
 	const error = budgetsError || customersError;
 
+	// Define types for the customer data structure (moved outside component previously can cause hooks mismatch if conditionally declared).
+	type BudgetTable = {
+		budget_id: string;
+		max_budget: number | null;
+		spend: number;
+		created_at?: string;
+	};
+
+	type Customer = {
+		user_id: string;
+		email: string | null;
+		spend: number;
+		max_budget: number | null;
+		created_at: string | null;
+		blocked: boolean;
+		litellm_budget_table: BudgetTable | null;
+	};
+
+	// Provide fallback for undefined budgets and customers
+	const budgetList = budgets || [];
+	const customerList = (customers || []) as Customer[];
+
+	// Pagination derived values
+	const total = budgetList.length;
+	const totalPages = Math.max(1, Math.ceil(total / pageSize));
+	const currentPage = Math.min(page, totalPages);
+	const paginatedBudgets = useMemo(() => {
+		const start = (currentPage - 1) * pageSize;
+		return budgetList.slice(start, start + pageSize);
+	}, [budgetList, currentPage, pageSize]);
+
+	// Reset to first page if budgets change
+	useEffect(() => {
+		setPage(1);
+	}, [budgets]);
+
+	// Function to count customers assigned to a specific budget
+	const getCustomerCountForBudget = (budgetId: string) => {
+		return customerList.filter(
+			(customer) => customer.litellm_budget_table?.budget_id === budgetId,
+		).length;
+	};
+
+	// Calculate total assigned customers across all budgets
+	const totalAssignedCustomers = customerList.filter(
+		(customer) => customer.litellm_budget_table !== null,
+	).length;
+
+	// After all hooks are declared, handle loading/error states
 	if (isLoading) {
 		return (
 			<div className="flex h-screen items-center justify-center">
@@ -36,40 +90,6 @@ const BudgetsPage: NextPage = () => {
 			</div>
 		);
 	}
-
-	// Define types for the customer data structure
-	interface BudgetTable {
-		budget_id: string;
-		max_budget: number | null;
-		spend: number;
-		created_at?: string;
-	}
-
-	interface Customer {
-		user_id: string;
-		email: string | null;
-		spend: number;
-		max_budget: number | null;
-		created_at: string | null;
-		blocked: boolean;
-		litellm_budget_table: BudgetTable | null;
-	}
-
-	// Provide fallback for undefined budgets and customers
-	const budgetList = budgets || [];
-	const customerList = (customers || []) as Customer[];
-
-	// Function to count customers assigned to a specific budget
-	const getCustomerCountForBudget = (budgetId: string) => {
-		return customerList.filter(
-			(customer) => customer.litellm_budget_table?.budget_id === budgetId,
-		).length;
-	};
-
-	// Calculate total assigned customers across all budgets
-	const totalAssignedCustomers = customerList.filter(
-		(customer) => customer.litellm_budget_table !== null,
-	).length;
 
 	return (
 		<div className="min-h-screen bg-background-light font-display dark:bg-background-dark">
@@ -263,8 +283,8 @@ const BudgetsPage: NextPage = () => {
 										</th>
 									</tr>
 								</thead>
-								<tbody>
-									{budgetList.map((budget) => (
+        <tbody>
+								{paginatedBudgets.map((budget) => (
 										<tr
 											key={budget.budget_id}
 											className="border-slate-200 border-b transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
@@ -294,7 +314,36 @@ const BudgetsPage: NextPage = () => {
 										</tr>
 									))}
 								</tbody>
-							</table>
+ 						</table>
+						</div>
+						{/* Pagination controls */}
+						<div className="mt-4 flex flex-col items-center justify-between gap-4 px-6 pb-4 md:flex-row">
+							<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+								<span>Rows per page:</span>
+								<select
+									className="rounded border border-slate-300 bg-transparent p-1 dark:border-slate-700"
+									value={pageSize}
+									onChange={(e) => {
+										setPageSize(Number(e.target.value));
+										setPage(1);
+									}}
+								>
+									<option value={10}>10</option>
+									<option value={25}>25</option>
+									<option value={50}>50</option>
+								</select>
+								<span>
+									{(Math.min((currentPage - 1) * pageSize + 1, total)) || 0} -
+									{Math.min(currentPage * pageSize, total)} of {total}
+								</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<button onClick={() => setPage(1)} disabled={currentPage === 1} className="rounded border px-2 py-1 text-sm disabled:opacity-50">First</button>
+								<button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Prev</button>
+								<span className="text-sm">Page {currentPage} of {totalPages}</span>
+								<button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Next</button>
+								<button onClick={() => setPage(totalPages)} disabled={currentPage === totalPages} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Last</button>
+							</div>
 						</div>
 					</div>
 

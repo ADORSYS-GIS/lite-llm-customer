@@ -12,6 +12,9 @@ import { useEffect, useMemo, useState } from "react";
 const CustomersPage: NextPage = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [statusFilter, setStatusFilter] = useState("All Status");
+	// Pagination state
+	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
 
 	const {
 		data: customers,
@@ -19,14 +22,13 @@ const CustomersPage: NextPage = () => {
 		error,
 	} = api.budget.listCustomersDetailed.useQuery();
 
-	// Filter customers based on search term and status
+ // Filter customers based on search term and status
 	const filteredCustomers = useMemo(() => {
 		if (!customers) return [];
 
 		return customers.filter((customer) => {
-			const matchesSearch = customer.user_id
-				.toLowerCase()
-				.includes(searchTerm.toLowerCase());
+			const haystack = `${customer.user_id} ${customer.email ?? ""}`.toLowerCase();
+			const matchesSearch = haystack.includes(searchTerm.toLowerCase());
 
 			const matchesStatus =
 				statusFilter === "All Status" ||
@@ -36,6 +38,20 @@ const CustomersPage: NextPage = () => {
 			return matchesSearch && matchesStatus;
 		});
 	}, [customers, searchTerm, statusFilter]);
+
+	// Reset to first page when filters/search change
+	useEffect(() => {
+		setPage(1);
+	}, [searchTerm, statusFilter]);
+
+	// Paginate filtered customers
+	const total = filteredCustomers.length;
+	const totalPages = Math.max(1, Math.ceil(total / pageSize));
+	const currentPage = Math.min(page, totalPages);
+	const paginatedCustomers = useMemo(() => {
+		const start = (currentPage - 1) * pageSize;
+		return filteredCustomers.slice(start, start + pageSize);
+	}, [filteredCustomers, currentPage, pageSize]);
 
 	// Track new customers in local storage
 	useEffect(() => {
@@ -179,8 +195,8 @@ const CustomersPage: NextPage = () => {
 									</th>
 								</tr>
 							</thead>
-							<tbody>
-								{filteredCustomers?.map((customer, index) => {
+       <tbody>
+								{paginatedCustomers?.map((customer, index) => {
 									const originalIndex = customers?.indexOf(customer) ?? index;
 									const isActive = customer.spend > 0;
 
@@ -233,12 +249,65 @@ const CustomersPage: NextPage = () => {
 									);
 								})}
 							</tbody>
-						</table>
+      </table>
+						</div>
+						{/* Pagination controls */}
+						<div className="mt-4 flex flex-col items-center justify-between gap-4 md:flex-row">
+							<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-white/60">
+								<span>Rows per page:</span>
+								<select
+									className="rounded border border-slate-300 bg-transparent p-1 dark:border-white/30"
+									value={pageSize}
+									onChange={(e) => {
+										setPageSize(Number(e.target.value));
+										setPage(1);
+									}}
+								>
+									<option value={10}>10</option>
+									<option value={25}>25</option>
+									<option value={50}>50</option>
+								</select>
+								<span>
+									{(Math.min((currentPage - 1) * pageSize + 1, total)) || 0} -
+									{Math.min(currentPage * pageSize, total)} of {total}
+								</span>
+							</div>
+							<div className="flex items-center gap-2">
+								<button
+									onClick={() => setPage(1)}
+									disabled={currentPage === 1}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									First
+								</button>
+								<button
+									onClick={() => setPage((p) => Math.max(1, p - 1))}
+									disabled={currentPage === 1}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Prev
+								</button>
+								<span className="text-sm">Page {currentPage} of {totalPages}</span>
+								<button
+									onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+									disabled={currentPage === totalPages}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Next
+								</button>
+								<button
+									onClick={() => setPage(totalPages)}
+									disabled={currentPage === totalPages}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Last
+								</button>
+							</div>
+						</div>
 					</div>
-				</div>
-			</main>
-		</div>
-	);
+				</main>
+			</div>
+		);
 };
 
 export default CustomersPage;
