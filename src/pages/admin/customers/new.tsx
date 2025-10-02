@@ -84,10 +84,10 @@ const NewCustomerPage: NextPage = () => {
 			<main className="flex-grow">
 				<div className="container mx-auto px-4 py-8">
 					<div className="mb-8">
-						<h2 className="mb-2 font-bold text-3xl text-white">
+						<h2 className="mb-2 font-bold text-3xl text-slate-900 dark:text-white">
 							Add New Customer
 						</h2>
-						<p className="text-white/60">
+						<p className="text-slate-600 dark:text-white/60">
 							Create a new customer by assigning them to a budget
 						</p>
 					</div>
@@ -98,7 +98,7 @@ const NewCustomerPage: NextPage = () => {
 							<div>
 								<label
 									htmlFor="userId"
-									className="mb-2 block font-medium text-sm text-white"
+									className="mb-2 block font-medium text-sm text-slate-900 dark:text-white"
 								>
 									Customer Email (ID)
 								</label>
@@ -107,7 +107,7 @@ const NewCustomerPage: NextPage = () => {
 									type="email"
 									value={userId}
 									onChange={(e) => setUserId(e.target.value)}
-									className="w-full rounded-lg border border-white/10 bg-background-dark px-3 py-2 text-white transition focus:border-primary focus:ring-2 focus:ring-primary"
+									className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 transition focus:border-primary focus:ring-2 focus:ring-primary dark:border-white/10 dark:bg-background-dark dark:text-white"
 									placeholder="e.g., customer@example.com"
 									required
 									disabled={isSubmitting}
@@ -117,7 +117,7 @@ const NewCustomerPage: NextPage = () => {
 							<div>
 								<label
 									htmlFor="budgetId"
-									className="mb-2 block font-medium text-sm text-white"
+									className="mb-2 block font-medium text-sm text-slate-900 dark:text-white"
 								>
 									Budget ID
 								</label>
@@ -126,7 +126,7 @@ const NewCustomerPage: NextPage = () => {
 									type="text"
 									value={budgetId}
 									onChange={(e) => setBudgetId(e.target.value)}
-									className="w-full rounded-lg border border-white/10 bg-background-dark px-3 py-2 text-white transition focus:border-primary focus:ring-2 focus:ring-primary"
+									className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 transition focus:border-primary focus:ring-2 focus:ring-primary dark:border-white/10 dark:bg-background-dark dark:text-white"
 									placeholder="e.g., free-tier"
 									required
 									disabled={isSubmitting}
@@ -187,7 +187,7 @@ const NewCustomerPage: NextPage = () => {
 
 									<Link
 										href="/admin/customers"
-										className="w-full rounded-lg border border-white/10 px-4 py-2 text-center font-medium text-sm text-white transition-colors hover:bg-white/5 sm:w-auto"
+										className="w-full rounded-lg border border-slate-300 px-4 py-2 text-center font-medium text-sm text-slate-900 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-white dark:hover:bg-white/5 sm:w-auto"
 									>
 										Cancel
 									</Link>

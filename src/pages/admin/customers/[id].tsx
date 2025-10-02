@@ -89,55 +89,55 @@ const CustomerDetailPage: NextPage = () => {
 			<main className="container mx-auto px-2 py-6 sm:px-4 sm:py-8">
 				<div className="mx-auto max-w-4xl px-2 sm:px-4 lg:px-8">
 					<div className="mb-8">
-						<h1 className="font-bold text-3xl text-white tracking-tight">
+						<h1 className="font-bold text-3xl text-slate-900 tracking-tight dark:text-white">
 							{customer.user_id}
 						</h1>
 					</div>
 					<div className="space-y-6">
 						<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-background-dark">
-								<h3 className="font-medium text-lg text-white">Spend</h3>
-								<p className="mt-2 font-bold text-3xl text-white">
+								<h3 className="font-medium text-lg text-slate-900 dark:text-white">Spend</h3>
+								<p className="mt-2 font-bold text-3xl text-slate-900 dark:text-white">
 									${customer.spend.toFixed(2)}
 								</p>
 							</div>
 							<div className="rounded-lg border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-background-dark">
-								<h3 className="font-medium text-lg text-white">Max Budget</h3>
-								<p className="mt-2 font-bold text-3xl text-white">
+								<h3 className="font-medium text-lg text-slate-900 dark:text-white">Max Budget</h3>
+								<p className="mt-2 font-bold text-3xl text-slate-900 dark:text-white">
 									$
 									{customer.max_budget ? customer.max_budget.toFixed(2) : "N/A"}
 								</p>
 							</div>
 						</div>
 						<div>
-							<h3 className="font-medium text-lg text-white">Budgets</h3>
+ 						<h3 className="font-medium text-lg text-slate-900 dark:text-white">Budgets</h3>
 							<div className="mt-4 overflow-x-auto rounded-lg border border-black/10 bg-white dark:border-white/10 dark:bg-background-dark">
 								<table className="min-w-full table-auto">
 									<thead className="border-black/10 border-b dark:border-white/10">
 										<tr>
-											<th className="px-6 py-3 text-left font-medium text-white/60 text-xs uppercase tracking-wider">
-												Budget ID
+ 										<th className="px-6 py-3 text-left font-medium text-slate-600 text-xs uppercase tracking-wider dark:text-white/60">
+ 											Budget ID
 											</th>
-											<th className="px-6 py-3 text-left font-medium text-white/60 text-xs uppercase tracking-wider">
-												Spend
+ 										<th className="px-6 py-3 text-left font-medium text-slate-600 text-xs uppercase tracking-wider dark:text-white/60">
+ 											Spend
 											</th>
-											<th className="px-6 py-3 text-left font-medium text-white/60 text-xs uppercase tracking-wider">
-												Max Budget
+ 										<th className="px-6 py-3 text-left font-medium text-slate-600 text-xs uppercase tracking-wider dark:text-white/60">
+ 											Max Budget
 											</th>
 										</tr>
 									</thead>
 									<tbody className="divide-y divide-black/10 dark:divide-white/10">
 										{customer.budgets.map((budget) => (
 											<tr key={budget.budget_id}>
-												<td className="whitespace-nowrap px-6 py-4 font-medium text-sm text-white">
+  										<td className="whitespace-nowrap px-6 py-4 font-medium text-sm text-slate-900 dark:text-white">
 													{budget.budget_id}
 												</td>
-												<td className="whitespace-nowrap px-6 py-4 text-sm text-white/60">
-													${budget.spend.toFixed(2)}
+  										<td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600 dark:text-white/60">
+  											${budget.spend.toFixed(2)}
 												</td>
-												<td className="whitespace-nowrap px-6 py-4 text-sm text-white/60">
-													$
-													{budget.max_budget
+  										<td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600 dark:text-white/60">
+  											$
+  											{budget.max_budget
 														? budget.max_budget.toFixed(2)
 														: "N/A"}
 												</td>

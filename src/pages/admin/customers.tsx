@@ -74,12 +74,12 @@ const CustomersPage: NextPage = () => {
 				<div className="container mx-auto px-4">
 					<div className="flex h-16 items-center justify-between">
 						<div className="flex items-center space-x-8">
-							<h1 className="font-bold text-white text-xl">LiteClient</h1>
+ 						<h1 className="font-bold text-slate-900 text-xl dark:text-white">LiteClient</h1>
 							<nav className="hidden items-center space-x-6 md:flex">
-								<Link
-									href="/"
-									className="font-medium text-sm text-white/60 transition-colors hover:text-white"
-								>
+ 							<Link
+ 								href="/"
+ 								className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-white/60 dark:hover:text-white"
+ 							>
 									Dashboard
 								</Link>
 								<Link
@@ -88,10 +88,10 @@ const CustomersPage: NextPage = () => {
 								>
 									Customers
 								</Link>
-								<Link
-									href="/admin/budgets"
-									className="font-medium text-sm text-white/60 transition-colors hover:text-white"
-								>
+ 							<Link
+ 								href="/admin/budgets"
+ 								className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-white/60 dark:hover:text-white"
+ 							>
 									Budgets
 								</Link>
 							</nav>
@@ -112,10 +112,10 @@ const CustomersPage: NextPage = () => {
 				<div className="container mx-auto px-4 py-8">
 					<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
 						<div>
-							<h2 className="font-bold text-3xl text-white">Customers</h2>
-							<p className="mt-1 text-white/60">
-								Manage and monitor your customer accounts
-							</p>
+ 						<h2 className="font-bold text-3xl text-slate-900 dark:text-white">Customers</h2>
+ 						<p className="mt-1 text-slate-600 dark:text-white/60">
+ 							Manage and monitor your customer accounts
+ 						</p>
 						</div>
 						<Link
 							href="/admin/customers/new"
@@ -128,20 +128,20 @@ const CustomersPage: NextPage = () => {
 					<div className="mb-6 space-y-4 md:flex md:items-center md:justify-between md:space-y-0">
 						<div className="relative flex-1 md:max-w-xs">
 							<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-								<span className="material-symbols-outlined text-white/40" />
+								<span className="material-symbols-outlined text-slate-400 dark:text-white/40" />
 							</div>
-							<input
-								className="w-full rounded-lg border-2 border-white/30 bg-background-dark py-2 pr-4 pl-10 text-white transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto"
-								placeholder="Search by email / customer ID..."
-								type="text"
-								value={searchTerm}
-								onChange={(e) => setSearchTerm(e.target.value)}
-							/>
+								<input
+									className="w-full rounded-lg border-2 border-slate-300 bg-white py-2 pr-4 pl-10 text-slate-900 transition focus:border-primary focus:ring-2 focus:ring-primary dark:border-white/30 dark:bg-background-dark dark:text-white md:w-auto"
+									placeholder="Search by email / customer ID..."
+									type="text"
+									value={searchTerm}
+									onChange={(e) => setSearchTerm(e.target.value)}
+								/>
 						</div>
 						<div className="flex items-center gap-4">
 							<div className="relative">
 								<select
-									className="w-full appearance-none rounded-lg border-2 border-white/30 bg-background-dark py-2 pr-8 pl-3 text-sm text-white transition focus:border-primary focus:ring-2 focus:ring-primary md:w-auto"
+									className="w-full appearance-none rounded-lg border-2 border-slate-300 bg-white py-2 pr-8 pl-3 text-sm text-slate-900 transition focus:border-primary focus:ring-2 focus:ring-primary dark:border-white/30 dark:bg-background-dark dark:text-white md:w-auto"
 									value={statusFilter}
 									onChange={(e) => setStatusFilter(e.target.value)}
 								>
@@ -153,14 +153,14 @@ const CustomersPage: NextPage = () => {
 									<span className="material-symbols-outlined text-sm" />
 								</div>
 							</div>
-							<p className="text-sm text-white/60">
+							<p className="text-sm text-slate-600 dark:text-white/60">
 								{filteredCustomers.length} customers found
 							</p>
 						</div>
 					</div>
 					<div className="overflow-x-auto bg-transparent">
 						<table className="w-full text-left text-sm">
-							<thead className="text-white/60 text-xs uppercase">
+							<thead className="text-slate-600 text-xs uppercase dark:text-white/60">
 								<tr>
 									<th className="px-6 py-3" scope="col">
 										Customer
@@ -201,24 +201,24 @@ const CustomersPage: NextPage = () => {
 														{customer.user_id.substring(0, 2).toUpperCase()}
 													</div>
 													<div>
-														<div className="font-bold text-base text-white">
+     									<div className="font-bold text-base text-slate-900 dark:text-white">
 															{customer.user_id}
 														</div>
 													</div>
 												</Link>
 											</th>
 											<td className="hidden px-6 py-4 lg:table-cell">
-												<span
-													className={`rounded-full px-2 py-1 font-medium text-xs ${
-														isActive
-															? "bg-green-500/20 text-white"
-															: "bg-gray-500/20 text-white"
-													}`}
-												>
-													{isActive ? "Active" : "Inactive"}
-												</span>
+   									<span
+   										className={`rounded-full px-2 py-1 font-medium text-xs ${
+   											isActive
+   												? "bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-white"
+   												: "bg-gray-100 text-gray-800 dark:bg-gray-500/20 dark:text-white"
+   											}`}
+   									>
+   										{isActive ? "Active" : "Inactive"}
+   									</span>
 											</td>
-											<td className="hidden px-6 py-4 text-white/80 lg:table-cell">
+   								<td className="hidden px-6 py-4 text-slate-600 dark:text-white/80 lg:table-cell">
 												{getCreationDate(customer)}
 											</td>
 											<td className="px-6 py-4 text-right">
