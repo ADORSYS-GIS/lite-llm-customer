@@ -174,89 +174,61 @@ const CustomersPage: NextPage = () => {
 							</p>
 						</div>
 					</div>
-					<div className="overflow-x-auto bg-transparent">
-						<table className="w-full text-left text-sm">
-							<thead className="text-slate-600 text-xs uppercase dark:text-white/60">
-								<tr>
-									<th className="px-6 py-3" scope="col">
-										Customer
-									</th>
-									<th className="hidden px-6 py-3 lg:table-cell" scope="col">
-										Status
-									</th>
-									<th className="hidden px-6 py-3 lg:table-cell" scope="col">
-										Created
-									</th>
-									<th
-										className="px-6 py-3 text-right text-white/60"
-										scope="col"
-									>
-										Actions
-									</th>
-								</tr>
-							</thead>
-       <tbody>
-								{paginatedCustomers?.map((customer, index) => {
-									const originalIndex = customers?.indexOf(customer) ?? index;
-									const isActive = customer.spend > 0;
-
-									return (
-										<tr
-											key={customer.user_id}
-											className="border-black/10 border-b transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5"
-										>
-											<th
-												className="whitespace-nowrap px-6 py-4 font-medium"
-												scope="row"
+					<div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+						<div className="border-slate-200 border-b px-6 py-4 dark:border-slate-700">
+							<h3 className="font-semibold text-lg text-slate-900 dark:text-white">Customer Overview</h3>
+						</div>
+						<div className="overflow-x-auto">
+							<table className="w-full text-left text-sm">
+								<thead className="bg-slate-50 text-slate-600 text-xs uppercase dark:bg-slate-800 dark:text-slate-400">
+									<tr>
+										<th className="px-6 py-3" scope="col">Customer</th>
+										<th className="hidden px-6 py-3 lg:table-cell" scope="col">Status</th>
+										<th className="hidden px-6 py-3 lg:table-cell" scope="col">Created</th>
+										<th className="px-6 py-3 text-right" scope="col">Actions</th>
+									</tr>
+								</thead>
+						       <tbody>
+									{paginatedCustomers?.map((customer, index) => {
+										const originalIndex = customers?.indexOf(customer) ?? index;
+										const isActive = customer.spend > 0;
+									
+										return (
+											<tr
+												key={customer.user_id}
+												className="border-slate-200 border-b transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
 											>
-												<Link
-													href={`/admin/customers/${customer.user_id}`}
-													className="flex items-center gap-3 transition-opacity hover:opacity-80"
-												>
-													<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 font-bold text-primary text-sm">
-														{customer.user_id.substring(0, 2).toUpperCase()}
-													</div>
-													<div>
-     									<div className="font-bold text-base text-slate-900 dark:text-white">
-															{customer.user_id}
+												<th className="whitespace-nowrap px-6 py-4 font-medium text-slate-900 dark:text-white" scope="row">
+													<Link href={`/admin/customers/${customer.user_id}`} className="flex items-center gap-3 transition-opacity hover:opacity-80">
+														<div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 font-bold text-primary text-sm">
+															{customer.user_id.substring(0, 2).toUpperCase()}
 														</div>
-													</div>
-												</Link>
-											</th>
-											<td className="hidden px-6 py-4 lg:table-cell">
-   									<span
-   										className={`rounded-full px-2 py-1 font-medium text-xs ${
-   											isActive
-   												? "bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-white"
-   												: "bg-gray-100 text-gray-800 dark:bg-gray-500/20 dark:text-white"
-   											}`}
-   									>
-   										{isActive ? "Active" : "Inactive"}
-   									</span>
-											</td>
-   								<td className="hidden px-6 py-4 text-slate-600 dark:text-white/80 lg:table-cell">
-												{getCreationDate(customer)}
-											</td>
-											<td className="px-6 py-4 text-right">
-												<Link
-													href={`/admin/customers/${customer.user_id}`}
-													className="font-medium text-primary hover:underline"
-												>
-													View details
-												</Link>
-											</td>
-										</tr>
-									);
-								})}
-							</tbody>
-      </table>
+														<div>
+			    												<div className="font-bold text-base text-slate-900 dark:text-white">{customer.user_id}</div>
+														</div>
+													</Link>
+												</th>
+												<td className="hidden px-6 py-4 lg:table-cell">
+			   										<span className={`rounded-full px-2 py-1 font-medium text-xs ${isActive ? "bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-white" : "bg-gray-100 text-gray-800 dark:bg-gray-500/20 dark:text-white"}`}>
+			   											{isActive ? "Active" : "Inactive"}
+			   										</span>
+												</td>
+			   								<td className="hidden px-6 py-4 text-slate-600 dark:text-slate-400 lg:table-cell">{getCreationDate(customer)}</td>
+												<td className="px-6 py-4 text-right">
+													<Link href={`/admin/customers/${customer.user_id}`} className="font-medium text-primary hover:underline">View details</Link>
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+					      </table>
 						</div>
 						{/* Pagination controls */}
-						<div className="mt-4 flex flex-col items-center justify-between gap-4 md:flex-row">
-							<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-white/60">
+						<div className="mt-4 flex flex-col items-center justify-between gap-4 px-6 pb-4 md:flex-row">
+							<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
 								<span>Rows per page:</span>
 								<select
-									className="rounded border border-slate-300 bg-transparent p-1 dark:border-white/30"
+									className="rounded border border-slate-300 bg-transparent p-1 dark:border-slate-700"
 									value={pageSize}
 									onChange={(e) => {
 										setPageSize(Number(e.target.value));
@@ -273,37 +245,14 @@ const CustomersPage: NextPage = () => {
 								</span>
 							</div>
 							<div className="flex items-center gap-2">
-								<button
-									onClick={() => setPage(1)}
-									disabled={currentPage === 1}
-									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
-								>
-									First
-								</button>
-								<button
-									onClick={() => setPage((p) => Math.max(1, p - 1))}
-									disabled={currentPage === 1}
-									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
-								>
-									Prev
-								</button>
+								<button onClick={() => setPage(1)} disabled={currentPage === 1} className="rounded border px-2 py-1 text-sm disabled:opacity-50">First</button>
+								<button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Prev</button>
 								<span className="text-sm">Page {currentPage} of {totalPages}</span>
-								<button
-									onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-									disabled={currentPage === totalPages}
-									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
-								>
-									Next
-								</button>
-								<button
-									onClick={() => setPage(totalPages)}
-									disabled={currentPage === totalPages}
-									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
-								>
-									Last
-								</button>
+								<button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Next</button>
+								<button onClick={() => setPage(totalPages)} disabled={currentPage === totalPages} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Last</button>
 							</div>
 						</div>
+					</div>
 					</div>
 				</main>
 			</div>
