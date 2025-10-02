@@ -2,7 +2,7 @@
 
 ## 📊 Custom Pricing Configuration
 
-LiteLLM allows you to define custom pricing models for your Ollama models. Here's how to set it up:
+LiteLLM allows you to define custom pricing models for your Ollama models.You can can get more details about  litellm pricing management from  [Litellm Pricing Management Documentation](./3-litellm-pricing-management.md).  Here's how to set it up:
 
 ### Model Configuration
 
@@ -88,7 +88,7 @@ curl -X POST "http://localhost:4000/budget/update" \
   -H "Authorization: Bearer sk-1234" \
   -d '{
     "budget_id": "<budget_id>",
-    "max_budget": <new_amount>,
+    "max_budget": <new_amount>
     }'
 ```
 
