@@ -43,7 +43,7 @@ const CustomersPage: NextPage = () => {
 	// Reset to first page when filters/search change
 	useEffect(() => {
 		setPage(1);
-	}, [searchTerm, statusFilter]);
+	}, []);
 
 	// Paginate filtered customers
 	const total = filteredCustomers.length;
@@ -278,6 +278,7 @@ const CustomersPage: NextPage = () => {
 							</div>
 							<div className="flex items-center gap-2">
 								<button
+									type="button"
 									onClick={() => setPage(1)}
 									disabled={currentPage === 1}
 									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
@@ -285,6 +286,7 @@ const CustomersPage: NextPage = () => {
 									First
 								</button>
 								<button
+									type="button"
 									onClick={() => setPage((p) => Math.max(1, p - 1))}
 									disabled={currentPage === 1}
 									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
@@ -295,6 +297,7 @@ const CustomersPage: NextPage = () => {
 									Page {currentPage} of {totalPages}
 								</span>
 								<button
+									type="button"
 									onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
 									disabled={currentPage === totalPages}
 									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
@@ -302,6 +305,7 @@ const CustomersPage: NextPage = () => {
 									Next
 								</button>
 								<button
+									type="button"
 									onClick={() => setPage(totalPages)}
 									disabled={currentPage === totalPages}
 									className="rounded border px-2 py-1 text-sm disabled:opacity-50"

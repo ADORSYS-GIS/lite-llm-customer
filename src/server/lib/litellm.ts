@@ -314,7 +314,7 @@ export async function assignBudget(userId: string, budgetId: string) {
 			budget_id: budgetId,
 		});
 
-		const response = await litellmClient.post("/customer/new", payload);
+		const response = await litellmClient.post("/customer/update", payload);
 		return response.data;
 	} catch (error) {
 		// If it's already a TRPCError (like our NOT_FOUND), just rethrow it
