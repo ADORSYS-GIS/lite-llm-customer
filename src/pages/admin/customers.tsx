@@ -198,9 +198,6 @@ const CustomersPage: NextPage = () => {
 										<th className="hidden px-6 py-3 lg:table-cell" scope="col">
 											Created
 										</th>
-										<th className="px-6 py-3 text-right" scope="col">
-											Actions
-										</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -240,14 +237,6 @@ const CustomersPage: NextPage = () => {
 												</td>
 												<td className="hidden px-6 py-4 text-slate-600 lg:table-cell dark:text-slate-400">
 													{getCreationDate(customer)}
-												</td>
-												<td className="px-6 py-4 text-right">
-													<Link
-														href={`/admin/customers/${customer.user_id}`}
-														className="font-medium text-primary hover:underline"
-													>
-														View details
-													</Link>
 												</td>
 											</tr>
 										);
