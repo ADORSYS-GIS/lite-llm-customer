@@ -2,7 +2,7 @@
 
 ## 📊 Custom Pricing Configuration
 
-LiteLLM allows you to define custom pricing models for your Ollama models. Here's how to set it up:
+LiteLLM allows you to define custom pricing models for your Ollama models.You can can get more details about  litellm pricing management from  [Litellm Pricing Management Documentation](./3-litellm-pricing-management.md).  Here's how to set it up:
 
 ### Model Configuration
 
@@ -55,11 +55,9 @@ If you have not created a budget yet you can use the [LiteLLM + Ollama Docker Se
 
 ## 📈 Usage Tracking
 
-### Check Customer Spending
-
+### Make a request to a model
 
 ```bash
-# Make a request to a model 
 curl -X POST http://localhost:4000/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sk-1234" \
@@ -76,6 +74,7 @@ curl -X POST http://localhost:4000/chat/completions \
 ```
 
 
+## Check Customer Spending
 ```bash
 # Get usage for a specific customer
 curl -X GET 'http://localhost:4000/customer/info?end_user_id=<end_user_id>' \
@@ -89,7 +88,7 @@ curl -X POST "http://localhost:4000/budget/update" \
   -H "Authorization: Bearer sk-1234" \
   -d '{
     "budget_id": "<budget_id>",
-    "max_budget": <new_amount>,
+    "max_budget": <new_amount>
     }'
 ```
 
