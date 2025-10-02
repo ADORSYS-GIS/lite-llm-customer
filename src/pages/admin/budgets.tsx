@@ -242,7 +242,7 @@ const BudgetsPage: NextPage = () => {
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
-										Total Allocated
+										Total Budget Amount
 									</p>
 									<p className="font-bold text-2xl text-slate-900 dark:text-white">
 										$

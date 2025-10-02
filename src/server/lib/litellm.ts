@@ -326,9 +326,9 @@ export async function assignBudget(userId: string, budgetId: string) {
 					err.response?.status === 404 ||
 					err.response?.status === 500) &&
 				typeof err.response?.data?.error?.message === "string" &&
-					err.response?.data?.error?.message
-						?.toLowerCase()
-						.includes("end user id") &&
+				err.response?.data?.error?.message
+					?.toLowerCase()
+					.includes("end user id") &&
 				err.response?.data?.error?.message
 					?.toLowerCase()
 					.includes("does not exist")
