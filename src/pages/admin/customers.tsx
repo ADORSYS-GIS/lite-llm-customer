@@ -16,11 +16,33 @@ const CustomersPage: NextPage = () => {
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSize] = useState(10);
 
+	// Batch selection state
+	const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+	const [selectedBudgetId, setSelectedBudgetId] = useState("");
+	const [assignMessage, setAssignMessage] = useState<{
+		type: "success" | "error";
+		text: string;
+	} | null>(null);
+
 	const {
 		data: customers,
 		isLoading,
 		error,
+		refetch,
 	} = api.budget.listCustomersDetailed.useQuery();
+
+	// Budgets for assignment picker
+	const { data: budgets } = api.budget.listBudgets.useQuery();
+
+	// Mutation for assigning a budget to a single customer (used in batch)
+	const assignMutation = api.budget.assignBudget.useMutation({
+		onSuccess: () => {
+			void refetch();
+		},
+		onError: (err) => {
+			setAssignMessage({ type: "error", text: err.message || "Failed to assign budget" });
+		},
+	});
 
 	// Filter customers based on search term and status
 	const filteredCustomers = useMemo(() => {
@@ -67,6 +89,46 @@ const CustomersPage: NextPage = () => {
 	// Get creation date for display
 	const getCreationDate = (customer: { user_id: string }) => {
 		return getFormattedCreationDate(customer.user_id);
+	};
+
+	const toggleSelected = (id: string) => {
+		setSelectedIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	};
+
+	const handleAssignToSelected = async () => {
+		setAssignMessage(null);
+		if (!selectedBudgetId) {
+			setAssignMessage({ type: "error", text: "Please select a budget first" });
+			return;
+		}
+		if (selectedIds.size === 0) {
+			setAssignMessage({ type: "error", text: "Please select at least one customer" });
+			return;
+		}
+		try {
+			await Promise.all(
+				Array.from(selectedIds).map((id) =>
+					assignMutation.mutateAsync({ user_id: id, budget_id: selectedBudgetId }),
+				),
+			);
+			setAssignMessage({
+				type: "success",
+				text: `Assigned budget to ${selectedIds.size} customer(s)`,
+			});
+			setSelectedIds(new Set());
+			void refetch();
+		} catch (e: unknown) {
+			const err = e as { message?: string };
+			setAssignMessage({
+				type: "error",
+				text: err?.message || "Failed to assign budget to selected customers",
+			});
+		}
 	};
 
 	if (isLoading) {
@@ -179,6 +241,43 @@ const CustomersPage: NextPage = () => {
 							</p>
 						</div>
 					</div>
+
+					{/* Bulk actions: assign budget to selected customers */}
+					{assignMessage && (
+						<div
+							className={`mb-4 rounded-md px-4 py-2 text-sm ${assignMessage.type === "success" ? "bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200" : "bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200"}`}
+						>
+							{assignMessage.text}
+						</div>
+					)}
+					<div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+						<div className="flex items-center gap-2">
+							<label className="text-sm text-slate-600 dark:text-slate-300">
+								Assign budget to selected:
+							</label>
+							<select
+								className="rounded-lg border-2 border-slate-300 bg-white py-2 pr-8 pl-3 text-slate-900 text-sm transition focus:border-primary focus:ring-2 focus:ring-primary dark:border-white/30 dark:bg-background-dark dark:text-white"
+								value={selectedBudgetId}
+								onChange={(e) => setSelectedBudgetId(e.target.value)}
+							>
+								<option value="">Select budget...</option>
+								{budgets?.map((b) => (
+									<option key={b.budget_id} value={b.budget_id}>
+										{b.budget_id}
+									</option>
+								))}
+							</select>
+							<button
+								type="button"
+								onClick={handleAssignToSelected}
+								disabled={selectedIds.size === 0 || !selectedBudgetId}
+								className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+							>
+								Assign to selected ({selectedIds.size})
+							</button>
+						</div>
+					</div>
+
 					<div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
 						<div className="border-slate-200 border-b px-6 py-4 dark:border-slate-700">
 							<h3 className="font-semibold text-lg text-slate-900 dark:text-white">
@@ -197,6 +296,9 @@ const CustomersPage: NextPage = () => {
 										</th>
 										<th className="hidden px-6 py-3 lg:table-cell" scope="col">
 											Created
+										</th>
+										<th className="px-6 py-3 text-right" scope="col">
+											Select
 										</th>
 									</tr>
 								</thead>
@@ -235,10 +337,18 @@ const CustomersPage: NextPage = () => {
 														{isActive ? "Active" : "Inactive"}
 													</span>
 												</td>
-												<td className="hidden px-6 py-4 text-slate-600 lg:table-cell dark:text-slate-400">
-													{getCreationDate(customer)}
-												</td>
-											</tr>
+  										<td className="hidden px-6 py-4 text-slate-600 lg:table-cell dark:text-slate-400">
+  											{getCreationDate(customer)}
+  										</td>
+  										<td className="px-6 py-4 text-right">
+  											<input
+  												type="checkbox"
+  												className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+  												checked={selectedIds.has(customer.user_id)}
+  												onChange={() => toggleSelected(customer.user_id)}
+  											/>
+  										</td>
+  									</tr>
 										);
 									})}
 								</tbody>
