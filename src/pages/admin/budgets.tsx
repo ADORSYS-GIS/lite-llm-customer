@@ -122,19 +122,30 @@ const BudgetsPage: NextPage = () => {
 								</Link>
 							</nav>
 						</div>
- 					<div className="flex items-center space-x-4">
- 						<button
- 							type="button"
- 							className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary md:hidden dark:text-slate-300 dark:hover:bg-slate-800"
- 							aria-controls="mobile-menu"
- 							aria-expanded={mobileOpen}
- 							onClick={() => setMobileOpen((o) => !o)}
- 							title="Toggle navigation menu"
- 						>
- 							<svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
- 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
- 							</svg>
- 						</button>
+						<div className="flex items-center space-x-4">
+							<button
+								type="button"
+								className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary md:hidden dark:text-slate-300 dark:hover:bg-slate-800"
+								aria-controls="mobile-menu"
+								aria-expanded={mobileOpen}
+								onClick={() => setMobileOpen((o) => !o)}
+								title="Toggle navigation menu"
+							>
+								<svg
+									className="h-6 w-6"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								</svg>
+							</button>
 							<button
 								type="button"
 								onClick={() => signOut()}
@@ -147,11 +158,29 @@ const BudgetsPage: NextPage = () => {
 				</div>
 			</header>
 			{/* Mobile menu */}
-			<div id="mobile-menu" className={`${mobileOpen ? "block" : "hidden"} md:hidden px-4 pb-3`}>
+			<div
+				id="mobile-menu"
+				className={`${mobileOpen ? "block" : "hidden"} px-4 pb-3 md:hidden`}
+			>
 				<div className="space-y-1 rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-					<Link href="/" className="block rounded px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">Dashboard</Link>
-					<Link href="/admin/customers" className="block rounded px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">Customers</Link>
-					<Link href="/admin/budgets" className="block rounded px-3 py-2 text-sm font-medium text-primary">Budgets</Link>
+					<Link
+						href="/"
+						className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+					>
+						Dashboard
+					</Link>
+					<Link
+						href="/admin/customers"
+						className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+					>
+						Customers
+					</Link>
+					<Link
+						href="/admin/budgets"
+						className="block rounded px-3 py-2 font-medium text-primary text-sm"
+					>
+						Budgets
+					</Link>
 				</div>
 			</div>
 
@@ -363,7 +392,7 @@ const BudgetsPage: NextPage = () => {
 									{Math.min(currentPage * pageSize, total)} of {total}
 								</span>
 							</div>
-       <div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
+							<div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
 								<button
 									type="button"
 									onClick={() => setPage(1)}

@@ -41,7 +41,10 @@ const CustomersPage: NextPage = () => {
 			void refetch();
 		},
 		onError: (err) => {
-			setAssignMessage({ type: "error", text: err.message || "Failed to assign budget" });
+			setAssignMessage({
+				type: "error",
+				text: err.message || "Failed to assign budget",
+			});
 		},
 	});
 
@@ -108,13 +111,19 @@ const CustomersPage: NextPage = () => {
 			return;
 		}
 		if (selectedIds.size === 0) {
-			setAssignMessage({ type: "error", text: "Please select at least one customer" });
+			setAssignMessage({
+				type: "error",
+				text: "Please select at least one customer",
+			});
 			return;
 		}
 		try {
 			await Promise.all(
 				Array.from(selectedIds).map((id) =>
-					assignMutation.mutateAsync({ user_id: id, budget_id: selectedBudgetId }),
+					assignMutation.mutateAsync({
+						user_id: id,
+						budget_id: selectedBudgetId,
+					}),
 				),
 			);
 			setAssignMessage({
@@ -178,19 +187,30 @@ const CustomersPage: NextPage = () => {
 								</Link>
 							</nav>
 						</div>
- 					<div className="flex items-center space-x-4">
- 						<button
- 							type="button"
- 							className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary md:hidden dark:text-slate-300 dark:hover:bg-slate-800"
- 							aria-controls="mobile-menu"
- 							aria-expanded={mobileOpen}
- 							onClick={() => setMobileOpen((o) => !o)}
- 							title="Toggle navigation menu"
- 						>
- 							<svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
- 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
- 							</svg>
- 						</button>
+						<div className="flex items-center space-x-4">
+							<button
+								type="button"
+								className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary md:hidden dark:text-slate-300 dark:hover:bg-slate-800"
+								aria-controls="mobile-menu"
+								aria-expanded={mobileOpen}
+								onClick={() => setMobileOpen((o) => !o)}
+								title="Toggle navigation menu"
+							>
+								<svg
+									className="h-6 w-6"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								</svg>
+							</button>
 							<button
 								type="button"
 								onClick={() => signOut()}
@@ -203,11 +223,29 @@ const CustomersPage: NextPage = () => {
 				</div>
 			</header>
 			{/* Mobile menu */}
-			<div id="mobile-menu" className={`${mobileOpen ? "block" : "hidden"} md:hidden px-4 pb-3`}>
+			<div
+				id="mobile-menu"
+				className={`${mobileOpen ? "block" : "hidden"} px-4 pb-3 md:hidden`}
+			>
 				<div className="space-y-1 rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-					<Link href="/" className="block rounded px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">Dashboard</Link>
-					<Link href="/admin/customers" className="block rounded px-3 py-2 text-sm font-medium text-primary">Customers</Link>
-					<Link href="/admin/budgets" className="block rounded px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">Budgets</Link>
+					<Link
+						href="/"
+						className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+					>
+						Dashboard
+					</Link>
+					<Link
+						href="/admin/customers"
+						className="block rounded px-3 py-2 font-medium text-primary text-sm"
+					>
+						Customers
+					</Link>
+					<Link
+						href="/admin/budgets"
+						className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+					>
+						Budgets
+					</Link>
 				</div>
 			</div>
 			<main className="flex-grow">
@@ -273,9 +311,9 @@ const CustomersPage: NextPage = () => {
 					)}
 					<div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
 						<div className="flex items-center gap-2">
-							<label className="text-sm text-slate-600 dark:text-slate-300">
+							<span className="text-slate-600 text-sm dark:text-slate-300">
 								Assign budget to selected:
-							</label>
+							</span>
 							<select
 								className="rounded-lg border-2 border-slate-300 bg-white py-2 pr-8 pl-3 text-slate-900 text-sm transition focus:border-primary focus:ring-2 focus:ring-primary dark:border-white/30 dark:bg-background-dark dark:text-white"
 								value={selectedBudgetId}
@@ -292,7 +330,7 @@ const CustomersPage: NextPage = () => {
 								type="button"
 								onClick={handleAssignToSelected}
 								disabled={selectedIds.size === 0 || !selectedBudgetId}
-								className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+								className="rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white disabled:opacity-50"
 							>
 								Assign to selected ({selectedIds.size})
 							</button>
@@ -345,9 +383,9 @@ const CustomersPage: NextPage = () => {
 															{customer.user_id.substring(0, 2).toUpperCase()}
 														</div>
 														<div>
-      									<div className="font-bold text-base text-slate-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400">
-      										{customer.user_id}
-      									</div>
+															<div className="font-bold text-base text-slate-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400">
+																{customer.user_id}
+															</div>
 														</div>
 													</Link>
 												</th>
@@ -358,18 +396,18 @@ const CustomersPage: NextPage = () => {
 														{isActive ? "Active" : "Inactive"}
 													</span>
 												</td>
-  										<td className="hidden px-6 py-4 text-slate-600 lg:table-cell dark:text-slate-400">
-  											{getCreationDate(customer)}
-  										</td>
-  										<td className="px-6 py-4 text-right">
-  											<input
-  												type="checkbox"
-  												className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
-  												checked={selectedIds.has(customer.user_id)}
-  												onChange={() => toggleSelected(customer.user_id)}
-  											/>
-  										</td>
-  									</tr>
+												<td className="hidden px-6 py-4 text-slate-600 lg:table-cell dark:text-slate-400">
+													{getCreationDate(customer)}
+												</td>
+												<td className="px-6 py-4 text-right">
+													<input
+														type="checkbox"
+														className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+														checked={selectedIds.has(customer.user_id)}
+														onChange={() => toggleSelected(customer.user_id)}
+													/>
+												</td>
+											</tr>
 										);
 									})}
 								</tbody>
@@ -396,7 +434,7 @@ const CustomersPage: NextPage = () => {
 									{Math.min(currentPage * pageSize, total)} of {total}
 								</span>
 							</div>
-       <div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
+							<div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
 								<button
 									type="button"
 									onClick={() => setPage(1)}
