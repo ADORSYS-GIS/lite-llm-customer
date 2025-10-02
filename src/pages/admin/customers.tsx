@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 const CustomersPage: NextPage = () => {
+	const [mobileOpen, setMobileOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [statusFilter, setStatusFilter] = useState("All Status");
 	// Pagination state
@@ -177,7 +178,19 @@ const CustomersPage: NextPage = () => {
 								</Link>
 							</nav>
 						</div>
-						<div className="flex items-center space-x-4">
+ 					<div className="flex items-center space-x-4">
+ 						<button
+ 							type="button"
+ 							className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary md:hidden dark:text-slate-300 dark:hover:bg-slate-800"
+ 							aria-controls="mobile-menu"
+ 							aria-expanded={mobileOpen}
+ 							onClick={() => setMobileOpen((o) => !o)}
+ 							title="Toggle navigation menu"
+ 						>
+ 							<svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+ 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+ 							</svg>
+ 						</button>
 							<button
 								type="button"
 								onClick={() => signOut()}
@@ -189,6 +202,14 @@ const CustomersPage: NextPage = () => {
 					</div>
 				</div>
 			</header>
+			{/* Mobile menu */}
+			<div id="mobile-menu" className={`${mobileOpen ? "block" : "hidden"} md:hidden px-4 pb-3`}>
+				<div className="space-y-1 rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+					<Link href="/" className="block rounded px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">Dashboard</Link>
+					<Link href="/admin/customers" className="block rounded px-3 py-2 text-sm font-medium text-primary">Customers</Link>
+					<Link href="/admin/budgets" className="block rounded px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">Budgets</Link>
+				</div>
+			</div>
 			<main className="flex-grow">
 				<div className="container mx-auto px-4 py-8">
 					<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
