@@ -381,3 +381,28 @@ export async function listBudgets() {
 		});
 	}
 }
+
+/**
+ * Updates an existing budget's max_budget.
+ */
+export async function updateBudget(budget_id: string, max_budget: number) {
+	try {
+		const payload = BudgetPayloadSchema.parse({ budget_id, max_budget });
+		const response = await litellmClient.post("/budget/update", payload);
+		return BudgetResponseSchema.parse(response.data);
+	} catch (error) {
+		if (isAxiosError(error)) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message:
+					error.response?.data?.error?.message ?? "Failed to update budget.",
+				cause: error,
+			});
+		}
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: "Failed to update budget.",
+			cause: error,
+		});
+	}
+}

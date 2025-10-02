@@ -3,7 +3,7 @@ import { api } from "@/utils/api";
 import type { NextPage } from "next";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const BudgetsPage: NextPage = () => {
 	// Pagination state for budgets table
@@ -283,14 +283,19 @@ const BudgetsPage: NextPage = () => {
 										</th>
 									</tr>
 								</thead>
-        <tbody>
-								{paginatedBudgets.map((budget) => (
+								<tbody>
+									{paginatedBudgets.map((budget) => (
 										<tr
 											key={budget.budget_id}
 											className="border-slate-200 border-b transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
 										>
 											<td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
-												{budget.budget_id}
+												<Link
+													href={`/admin/budgets/${encodeURIComponent(budget.budget_id)}`}
+													className="text-primary hover:underline"
+												>
+													{budget.budget_id}
+												</Link>
 											</td>
 											<td className="px-6 py-4 text-slate-900 dark:text-white">
 												${budget.max_budget.toFixed(2)}
@@ -314,11 +319,11 @@ const BudgetsPage: NextPage = () => {
 										</tr>
 									))}
 								</tbody>
- 						</table>
+							</table>
 						</div>
 						{/* Pagination controls */}
 						<div className="mt-4 flex flex-col items-center justify-between gap-4 px-6 pb-4 md:flex-row">
-							<div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+							<div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
 								<span>Rows per page:</span>
 								<select
 									className="rounded border border-slate-300 bg-transparent p-1 dark:border-slate-700"
@@ -333,16 +338,42 @@ const BudgetsPage: NextPage = () => {
 									<option value={50}>50</option>
 								</select>
 								<span>
-									{(Math.min((currentPage - 1) * pageSize + 1, total)) || 0} -
+									{Math.min((currentPage - 1) * pageSize + 1, total) || 0} -
 									{Math.min(currentPage * pageSize, total)} of {total}
 								</span>
 							</div>
 							<div className="flex items-center gap-2">
-								<button onClick={() => setPage(1)} disabled={currentPage === 1} className="rounded border px-2 py-1 text-sm disabled:opacity-50">First</button>
-								<button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Prev</button>
-								<span className="text-sm">Page {currentPage} of {totalPages}</span>
-								<button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Next</button>
-								<button onClick={() => setPage(totalPages)} disabled={currentPage === totalPages} className="rounded border px-2 py-1 text-sm disabled:opacity-50">Last</button>
+								<button
+									onClick={() => setPage(1)}
+									disabled={currentPage === 1}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									First
+								</button>
+								<button
+									onClick={() => setPage((p) => Math.max(1, p - 1))}
+									disabled={currentPage === 1}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Prev
+								</button>
+								<span className="text-sm">
+									Page {currentPage} of {totalPages}
+								</span>
+								<button
+									onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+									disabled={currentPage === totalPages}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Next
+								</button>
+								<button
+									onClick={() => setPage(totalPages)}
+									disabled={currentPage === totalPages}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Last
+								</button>
 							</div>
 						</div>
 					</div>

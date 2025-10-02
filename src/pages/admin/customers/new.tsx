@@ -98,7 +98,7 @@ const NewCustomerPage: NextPage = () => {
 							<div>
 								<label
 									htmlFor="userId"
-									className="mb-2 block font-medium text-sm text-slate-900 dark:text-white"
+									className="mb-2 block font-medium text-slate-900 text-sm dark:text-white"
 								>
 									Customer Email (ID)
 								</label>
@@ -117,7 +117,7 @@ const NewCustomerPage: NextPage = () => {
 							<div>
 								<label
 									htmlFor="budgetId"
-									className="mb-2 block font-medium text-sm text-slate-900 dark:text-white"
+									className="mb-2 block font-medium text-slate-900 text-sm dark:text-white"
 								>
 									Budget ID
 								</label>
@@ -187,7 +187,7 @@ const NewCustomerPage: NextPage = () => {
 
 									<Link
 										href="/admin/customers"
-										className="w-full rounded-lg border border-slate-300 px-4 py-2 text-center font-medium text-sm text-slate-900 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-white dark:hover:bg-white/5 sm:w-auto"
+										className="w-full rounded-lg border border-slate-300 px-4 py-2 text-center font-medium text-slate-900 text-sm transition-colors hover:bg-slate-50 sm:w-auto dark:border-white/10 dark:text-white dark:hover:bg-white/5"
 									>
 										Cancel
 									</Link>
