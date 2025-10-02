@@ -222,9 +222,9 @@ const CustomersPage: NextPage = () => {
 															{customer.user_id.substring(0, 2).toUpperCase()}
 														</div>
 														<div>
-															<div className="font-bold text-base text-slate-900 dark:text-white">
-																{customer.user_id}
-															</div>
+      									<div className="font-bold text-base text-slate-900 transition-colors hover:text-blue-600 dark:text-white dark:hover:text-blue-400">
+      										{customer.user_id}
+      									</div>
 														</div>
 													</Link>
 												</th>
@@ -265,7 +265,7 @@ const CustomersPage: NextPage = () => {
 									{Math.min(currentPage * pageSize, total)} of {total}
 								</span>
 							</div>
-							<div className="flex items-center gap-2">
+       <div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
 								<button
 									type="button"
 									onClick={() => setPage(1)}

@@ -342,7 +342,7 @@ const BudgetsPage: NextPage = () => {
 									{Math.min(currentPage * pageSize, total)} of {total}
 								</span>
 							</div>
-							<div className="flex items-center gap-2">
+       <div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
 								<button
 									type="button"
 									onClick={() => setPage(1)}
