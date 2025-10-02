@@ -314,8 +314,32 @@ export async function assignBudget(userId: string, budgetId: string) {
 			budget_id: budgetId,
 		});
 
-		const response = await litellmClient.post("/customer/update", payload);
-		return response.data;
+		try {
+			// Try updating an existing customer first
+			const response = await litellmClient.post("/customer/update", payload);
+			return response.data;
+		} catch (err) {
+			// If the update fails because end user doesn't exist, create them
+			if (
+				isAxiosError(err) &&
+				(err.response?.status === 400 ||
+					err.response?.status === 404 ||
+					err.response?.status === 500) &&
+				typeof err.response?.data?.error?.message === "string" &&
+					err.response?.data?.error?.message
+						?.toLowerCase()
+						.includes("end user id") &&
+				err.response?.data?.error?.message
+					?.toLowerCase()
+					.includes("does not exist")
+			) {
+				// Create the customer and assign the budget in one call
+				const createResp = await litellmClient.post("/customer/new", payload);
+				return createResp.data;
+			}
+			// Re-throw to outer catch for generic handling
+			throw err;
+		}
 	} catch (error) {
 		// If it's already a TRPCError (like our NOT_FOUND), just rethrow it
 		if (error instanceof TRPCError) {

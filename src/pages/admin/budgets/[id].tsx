@@ -162,10 +162,10 @@ const BudgetDetailPage: NextPage = () => {
 											max_budget: amount,
 										});
 									}}
-									disabled={updateMutation.isLoading}
+									disabled={updateMutation.isPending}
 									className="rounded bg-primary px-4 py-2 font-medium text-white disabled:opacity-60"
 								>
-									{updateMutation.isLoading ? "Saving..." : "Save"}
+									{updateMutation.isPending ? "Saving..." : "Save"}
 								</button>
 							</div>
 							{message && (

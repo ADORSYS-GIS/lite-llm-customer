@@ -187,10 +187,10 @@ const CustomerDetailPage: NextPage = () => {
 											budget_id: selectedBudgetId,
 										});
 									}}
-									disabled={assignMutation.isLoading}
+									disabled={assignMutation.isPending}
 									className="rounded bg-primary px-4 py-2 font-medium text-white disabled:opacity-60"
 								>
-									{assignMutation.isLoading ? "Assigning..." : "Assign Budget"}
+									{assignMutation.isPending ? "Assigning..." : "Assign Budget"}
 								</button>
 							</div>
 							{assignMessage && (
