@@ -5,6 +5,7 @@ import {
 	listBudgets,
 	listCustomers,
 	listCustomersDetailed,
+	updateBudget,
 } from "@/server/lib/litellm";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -40,6 +41,11 @@ const createBudgetInputSchema = z.object({
 const assignBudgetInputSchema = z.object({
 	user_id: z.string().min(1, "user_id is required"),
 	budget_id: z.string().min(1, "budget_id is required"),
+});
+
+const updateBudgetInputSchema = z.object({
+	budget_id: z.string().min(1, "budget_id is required"),
+	max_budget: z.number(),
 });
 
 export const budgetRouter = createTRPCRouter({
@@ -82,6 +88,11 @@ export const budgetRouter = createTRPCRouter({
 		.input(assignBudgetInputSchema)
 		.mutation(async ({ input }) => {
 			return assignBudget(input.user_id, input.budget_id);
+		}),
+	updateBudget: adminProcedure
+		.input(updateBudgetInputSchema)
+		.mutation(async ({ input }) => {
+			return updateBudget(input.budget_id, input.max_budget);
 		}),
 	listBudgets: adminProcedure.query(async () => {
 		return listBudgets();

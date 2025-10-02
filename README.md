@@ -41,8 +41,10 @@ All admin-only interactions with LiteLLM budgets and customers are exposed via t
 
 - `budget.listCustomers` – lists customers by calling the LiteLLM customer list endpoint.
 - `budget.getCustomerInfo` – fetches customer details given `{ end_user_id }`.
-- `budget.createBudget` – creates a budget with `{ user_id, budget_id }`.
+- `budget.createBudget` – creates a budget with `{ budget_id, max_budget, budget_duration? }`.
 - `budget.assignBudget` – assigns an existing budget via `{ user_id, budget_id }`.
+- `budget.listBudgets` – lists budgets from LiteLLM.
+- `budget.updateBudget` – updates a budget's `max_budget` via `{ budget_id, max_budget }`.
 
 Every procedure:
 
@@ -50,7 +52,7 @@ Every procedure:
 - Requires an authenticated admin session enforced by the `adminProcedure` middleware in `src/server/api/trpc.ts`.
 - Returns normalized, user-safe error messages using `TRPCError`.
 
-Refer to `src/server/api/routers/budget.ts` and `src/server/api/routers/budget.test.ts` for implementation and tests that mock the LiteLLM wrapper.
+Refer to `src/server/api/routers/budget.ts` for implementation details.
 
 ## How do I deploy this?
 

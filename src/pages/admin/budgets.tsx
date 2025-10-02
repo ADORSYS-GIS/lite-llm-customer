@@ -3,8 +3,14 @@ import { api } from "@/utils/api";
 import type { NextPage } from "next";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 const BudgetsPage: NextPage = () => {
+	const [mobileOpen, setMobileOpen] = useState(false);
+	// Pagination state for budgets table
+	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
+
 	const {
 		data: budgets,
 		isLoading: budgetsLoading,
@@ -21,6 +27,55 @@ const BudgetsPage: NextPage = () => {
 	const isLoading = budgetsLoading || customersLoading;
 	const error = budgetsError || customersError;
 
+	// Define types for the customer data structure (moved outside component previously can cause hooks mismatch if conditionally declared).
+	type BudgetTable = {
+		budget_id: string;
+		max_budget: number | null;
+		spend: number;
+		created_at?: string;
+	};
+
+	type Customer = {
+		user_id: string;
+		email: string | null;
+		spend: number;
+		max_budget: number | null;
+		created_at: string | null;
+		blocked: boolean;
+		litellm_budget_table: BudgetTable | null;
+	};
+
+	// Provide fallback for undefined budgets and customers
+	const budgetList = budgets || [];
+	const customerList = (customers || []) as Customer[];
+
+	// Pagination derived values
+	const total = budgetList.length;
+	const totalPages = Math.max(1, Math.ceil(total / pageSize));
+	const currentPage = Math.min(page, totalPages);
+	const paginatedBudgets = useMemo(() => {
+		const start = (currentPage - 1) * pageSize;
+		return budgetList.slice(start, start + pageSize);
+	}, [budgetList, currentPage, pageSize]);
+
+	// Reset to first page if budgets change
+	useEffect(() => {
+		setPage(1);
+	}, []);
+
+	// Function to count customers assigned to a specific budget
+	const getCustomerCountForBudget = (budgetId: string) => {
+		return customerList.filter(
+			(customer) => customer.litellm_budget_table?.budget_id === budgetId,
+		).length;
+	};
+
+	// Calculate total assigned customers across all budgets
+	const totalAssignedCustomers = customerList.filter(
+		(customer) => customer.litellm_budget_table !== null,
+	).length;
+
+	// After all hooks are declared, handle loading/error states
 	if (isLoading) {
 		return (
 			<div className="flex h-screen items-center justify-center">
@@ -36,40 +91,6 @@ const BudgetsPage: NextPage = () => {
 			</div>
 		);
 	}
-
-	// Define types for the customer data structure
-	interface BudgetTable {
-		budget_id: string;
-		max_budget: number | null;
-		spend: number;
-		created_at?: string;
-	}
-
-	interface Customer {
-		user_id: string;
-		email: string | null;
-		spend: number;
-		max_budget: number | null;
-		created_at: string | null;
-		blocked: boolean;
-		litellm_budget_table: BudgetTable | null;
-	}
-
-	// Provide fallback for undefined budgets and customers
-	const budgetList = budgets || [];
-	const customerList = (customers || []) as Customer[];
-
-	// Function to count customers assigned to a specific budget
-	const getCustomerCountForBudget = (budgetId: string) => {
-		return customerList.filter(
-			(customer) => customer.litellm_budget_table?.budget_id === budgetId,
-		).length;
-	};
-
-	// Calculate total assigned customers across all budgets
-	const totalAssignedCustomers = customerList.filter(
-		(customer) => customer.litellm_budget_table !== null,
-	).length;
 
 	return (
 		<div className="min-h-screen bg-background-light font-display dark:bg-background-dark">
@@ -104,6 +125,29 @@ const BudgetsPage: NextPage = () => {
 						<div className="flex items-center space-x-4">
 							<button
 								type="button"
+								className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary md:hidden dark:text-slate-300 dark:hover:bg-slate-800"
+								aria-controls="mobile-menu"
+								aria-expanded={mobileOpen}
+								onClick={() => setMobileOpen((o) => !o)}
+								title="Toggle navigation menu"
+							>
+								<svg
+									className="h-6 w-6"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								</svg>
+							</button>
+							<button
+								type="button"
 								onClick={() => signOut()}
 								className="font-medium text-red-500 text-sm transition-colors hover:text-red-600"
 							>
@@ -113,6 +157,32 @@ const BudgetsPage: NextPage = () => {
 					</div>
 				</div>
 			</header>
+			{/* Mobile menu */}
+			<div
+				id="mobile-menu"
+				className={`${mobileOpen ? "block" : "hidden"} px-4 pb-3 md:hidden`}
+			>
+				<div className="space-y-1 rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+					<Link
+						href="/"
+						className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+					>
+						Dashboard
+					</Link>
+					<Link
+						href="/admin/customers"
+						className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+					>
+						Customers
+					</Link>
+					<Link
+						href="/admin/budgets"
+						className="block rounded px-3 py-2 font-medium text-primary text-sm"
+					>
+						Budgets
+					</Link>
+				</div>
+			</div>
 
 			<main className="flex-grow">
 				<div className="container mx-auto px-4 py-8">
@@ -127,7 +197,7 @@ const BudgetsPage: NextPage = () => {
 						</div>
 						<Link
 							href="/admin/budgets/new"
-							className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0"
+							className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-primary/90 md:mt-0 md:w-auto"
 						>
 							<span className="material-symbols-outlined text-base">
 								Create
@@ -172,7 +242,7 @@ const BudgetsPage: NextPage = () => {
 							<div className="flex items-center justify-between">
 								<div>
 									<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
-										Total Allocated
+										Total Budget Amount
 									</p>
 									<p className="font-bold text-2xl text-slate-900 dark:text-white">
 										$
@@ -264,13 +334,18 @@ const BudgetsPage: NextPage = () => {
 									</tr>
 								</thead>
 								<tbody>
-									{budgetList.map((budget) => (
+									{paginatedBudgets.map((budget) => (
 										<tr
 											key={budget.budget_id}
 											className="border-slate-200 border-b transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
 										>
 											<td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
-												{budget.budget_id}
+												<Link
+													href={`/admin/budgets/${encodeURIComponent(budget.budget_id)}`}
+													className="text-primary hover:underline"
+												>
+													{budget.budget_id}
+												</Link>
 											</td>
 											<td className="px-6 py-4 text-slate-900 dark:text-white">
 												${budget.max_budget.toFixed(2)}
@@ -287,12 +362,73 @@ const BudgetsPage: NextPage = () => {
 												{getCustomerCountForBudget(budget.budget_id)}
 											</td>
 											<td className="px-6 py-4 text-slate-600 dark:text-slate-400">
-												{new Date(budget.created_at).toLocaleDateString()}
+												{budget.created_at
+													? new Date(budget.created_at).toLocaleDateString()
+													: "—"}
 											</td>
 										</tr>
 									))}
 								</tbody>
 							</table>
+						</div>
+						{/* Pagination controls */}
+						<div className="mt-4 flex flex-col items-center justify-between gap-4 px-6 pb-4 md:flex-row">
+							<div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
+								<span>Rows per page:</span>
+								<select
+									className="rounded border border-slate-300 bg-transparent p-1 dark:border-slate-700"
+									value={pageSize}
+									onChange={(e) => {
+										setPageSize(Number(e.target.value));
+										setPage(1);
+									}}
+								>
+									<option value={10}>10</option>
+									<option value={25}>25</option>
+									<option value={50}>50</option>
+								</select>
+								<span>
+									{Math.min((currentPage - 1) * pageSize + 1, total) || 0} -
+									{Math.min(currentPage * pageSize, total)} of {total}
+								</span>
+							</div>
+							<div className="flex items-center gap-2 text-slate-600 text-sm dark:text-slate-400">
+								<button
+									type="button"
+									onClick={() => setPage(1)}
+									disabled={currentPage === 1}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									First
+								</button>
+								<button
+									type="button"
+									onClick={() => setPage((p) => Math.max(1, p - 1))}
+									disabled={currentPage === 1}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Prev
+								</button>
+								<span className="text-sm">
+									Page {currentPage} of {totalPages}
+								</span>
+								<button
+									type="button"
+									onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+									disabled={currentPage === totalPages}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Next
+								</button>
+								<button
+									type="button"
+									onClick={() => setPage(totalPages)}
+									disabled={currentPage === totalPages}
+									className="rounded border px-2 py-1 text-sm disabled:opacity-50"
+								>
+									Last
+								</button>
+							</div>
 						</div>
 					</div>
 

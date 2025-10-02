@@ -14,7 +14,8 @@ export const Layout = ({ children }: PropsWithChildren) => {
 	};
 	return (
 		<div className="relative flex h-auto min-h-screen w-full">
-			<aside className="flex w-64 flex-col border-black/10 border-r bg-white dark:border-white/10 dark:bg-background-dark">
+			{/* Desktop sidebar (hidden on small screens) */}
+			<aside className="hidden w-64 flex-col border-black/10 border-r bg-white sm:flex dark:border-white/10 dark:bg-background-dark">
 				<div className="flex h-16 items-center gap-4 px-6">
 					<div className="h-8 w-8 text-primary">
 						<svg
@@ -93,7 +94,49 @@ export const Layout = ({ children }: PropsWithChildren) => {
 					</div>
 				</div>
 			</aside>
-			<main className="flex-1 bg-background-light p-8 dark:bg-background-dark/80">
+			{/* Mobile top bar (visible only on small screens) */}
+			<header className="w-full border-black/5 border-b bg-white px-4 py-3 sm:hidden dark:border-white/5 dark:bg-background-dark">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<div className="h-8 w-8 text-primary">
+							<svg
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<title>LiteLLM Logo</title>
+								<path d="M12 2L2 7l10 5 10-5-10-5z" />
+							</svg>
+						</div>
+						<h2 className="font-bold text-base text-black dark:text-white">
+							LiteClient
+						</h2>
+					</div>
+					<nav className="flex items-center gap-3">
+						<Link href="/" className="text-black/70 text-sm dark:text-white/70">
+							Dashboard
+						</Link>
+						<Link
+							href="/admin/customers"
+							className="text-black/70 text-sm dark:text-white/70"
+						>
+							Customers
+						</Link>
+						<Link
+							href="/admin/budgets"
+							className="text-black/70 text-sm dark:text-white/70"
+						>
+							Budgets
+						</Link>
+					</nav>
+				</div>
+			</header>
+
+			<main className="flex-1 bg-background-light p-4 sm:p-8 dark:bg-background-dark/80">
 				{children}
 			</main>
 		</div>

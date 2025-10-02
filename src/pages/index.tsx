@@ -1,8 +1,10 @@
 import { api } from "@/utils/api";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function AdminDashboard() {
+	const [mobileOpen, setMobileOpen] = useState(false);
 	const { data: session } = useSession();
 	const { data: customers } = api.budget.listCustomersDetailed.useQuery();
 	const { data: healthStatus } = api.system.health.useQuery();
@@ -46,6 +48,29 @@ export default function AdminDashboard() {
 							</nav>
 						</div>
 						<div className="flex items-center space-x-4">
+							<button
+								type="button"
+								className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary md:hidden dark:text-slate-300 dark:hover:bg-slate-800"
+								aria-controls="mobile-menu"
+								aria-expanded={mobileOpen}
+								onClick={() => setMobileOpen((o) => !o)}
+								title="Toggle navigation menu"
+							>
+								<svg
+									className="h-6 w-6"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								</svg>
+							</button>
 							<span className="text-slate-600 text-sm dark:text-slate-400">
 								Welcome, {session?.user?.email}
 							</span>
@@ -57,6 +82,32 @@ export default function AdminDashboard() {
 								Sign Out
 							</button>
 						</div>
+					</div>
+				</div>
+				{/* Mobile menu */}
+				<div
+					id="mobile-menu"
+					className={`${mobileOpen ? "block" : "hidden"} px-4 pb-3 md:hidden`}
+				>
+					<div className="space-y-1 rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+						<Link
+							href="/"
+							className="block rounded px-3 py-2 font-medium text-primary text-sm"
+						>
+							Dashboard
+						</Link>
+						<Link
+							href="/admin/customers"
+							className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+						>
+							Customers
+						</Link>
+						<Link
+							href="/admin/budgets"
+							className="block rounded px-3 py-2 font-medium text-slate-700 text-sm hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+						>
+							Budgets
+						</Link>
 					</div>
 				</div>
 			</header>
@@ -75,7 +126,11 @@ export default function AdminDashboard() {
 
 				{/* Stats Cards */}
 				<div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-					<div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+					<Link
+						href="/admin/customers"
+						aria-label="View customers list"
+						className="rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+					>
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
@@ -103,9 +158,13 @@ export default function AdminDashboard() {
 								</svg>
 							</div>
 						</div>
-					</div>
+					</Link>
 
-					<div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+					<Link
+						href="/admin/customers"
+						aria-label="View active customers"
+						className="rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+					>
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
@@ -133,9 +192,13 @@ export default function AdminDashboard() {
 								</svg>
 							</div>
 						</div>
-					</div>
+					</Link>
 
-					<div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+					<Link
+						href="/admin/customers"
+						aria-label="View spending details"
+						className="rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+					>
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
@@ -163,9 +226,13 @@ export default function AdminDashboard() {
 								</svg>
 							</div>
 						</div>
-					</div>
+					</Link>
 
-					<div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+					<Link
+						href="/admin/budgets"
+						aria-label="View budgets list"
+						className="rounded-xl border border-slate-200 bg-white p-6 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800"
+					>
 						<div className="flex items-center justify-between">
 							<div>
 								<p className="font-medium text-slate-600 text-sm dark:text-slate-400">
@@ -193,7 +260,7 @@ export default function AdminDashboard() {
 								</svg>
 							</div>
 						</div>
-					</div>
+					</Link>
 				</div>
 
 				{/* Quick Actions */}
