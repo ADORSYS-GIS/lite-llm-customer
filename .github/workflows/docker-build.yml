@@ -54,8 +54,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=ghcr.io/${{ steps.repo.outputs.repository }}:feat/dockerization
-          cache-to: type=registry,ref=ghcr.io/${{ steps.repo.outputs.repository }}:feat/dockerization,mode=max
+          cache-from: type=registry,ref=ghcr.io/${{ steps.repo.outputs.repository }}:feat-dockerization
+          cache-to: type=registry,ref=ghcr.io/${{ steps.repo.outputs.repository }}:feat-dockerization,mode=max
 
   validate-docker-compose:
     runs-on: ubuntu-latest
