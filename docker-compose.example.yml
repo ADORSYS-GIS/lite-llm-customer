@@ -1,0 +1,108 @@
+version: "3.8"
+
+networks:
+  litellm-network:
+    driver: bridge
+
+volumes:
+  ollama:
+  pgdata:
+
+services:
+  # Ollama Service - Local LLM Runtime
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    networks:
+      - litellm-network
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+   
+  # PostgreSQL Database for LiteLLM
+  db:
+    image: postgres:15-alpine
+    container_name: litellm-db
+    networks:
+      - litellm-network
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: litellm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # LiteLLM Proxy Service
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm
+    networks:
+      - litellm-network
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    environment:
+      LITELLM_MASTER_KEY: sk-1234
+      LITELLM_SALT_KEY: this-is-a-random-salt
+      DATABASE_URL: postgresql://litellm:secret@db:5432/litellm
+    command: ["--config", "/app/config.yaml"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Next.js Application - LiteLLM Customer Management UI
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: litellm-customer-ui
+    networks:
+      - litellm-network
+    depends_on:
+      litellm:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      # Node Environment
+      NODE_ENV: production
+      
+      # LiteLLM Configuration
+      LITELLM_PROXY_URL: http://litellm:4000
+      LITELLM_API_KEY: sk-1234
+      
+      # NextAuth Configuration
+      # Generate with: openssl rand -base64 32
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      
+      # Admin Credentials
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-password}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
