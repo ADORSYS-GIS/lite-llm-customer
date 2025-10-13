@@ -25,13 +25,7 @@ ENV NODE_ENV production
 ENV SKIP_ENV_VALIDATION 1
 
 # Generate env.js from environment variables
-RUN echo "// This file is auto-generated during build
-const env = {
-  NODE_ENV: process.env.NODE_ENV || 'production',
-  // Add other environment variables here
-};
-
-export default env;" > ./src/env.js
+RUN printf '// This file is auto-generated during build\nconst env = {\n  NODE_ENV: process.env.NODE_ENV || "production",\n  // Add other environment variables here\n};\n\nexport default env;' > ./src/env.js
 
 # Build the application
 RUN yarn build
