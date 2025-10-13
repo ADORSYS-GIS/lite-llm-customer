@@ -20,12 +20,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables for build
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
-ENV SKIP_ENV_VALIDATION 1
-
-# Generate env.js from environment variables
-RUN printf '// This file is auto-generated during build\nconst env = {\n  NODE_ENV: process.env.NODE_ENV || "production",\n  // Add other environment variables here\n};\n\nexport default env;' > ./src/env.js
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV SKIP_ENV_VALIDATION=1
 
 # Build the application
 RUN yarn build

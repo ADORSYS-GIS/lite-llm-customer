@@ -1,4 +1,4 @@
-import env from "@/env.js";
+import { env } from "@/env.js";
 import type { NextAuthOptions } from "next-auth";
 import NextAuth, { type DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
