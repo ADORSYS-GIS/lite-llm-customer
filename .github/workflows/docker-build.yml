@@ -68,3 +68,4 @@ jobs:
         run: |
           docker compose -f docker-compose.example.yml config > /dev/null
           echo "✅ docker-compose.example.yml is valid"
+          
