@@ -2,21 +2,21 @@ name: docker-build
 
 on:
   push:
-    branches: 
+    branches:
       - feat/dockerize-application
   pull_request:
-    branches: 
+    branches:
       - feat/dockerize-application
 
 jobs:
   docker-build:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/dockerize-application'
     permissions:
       contents: read
       packages: write
       security-events: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -58,6 +58,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-
-          
