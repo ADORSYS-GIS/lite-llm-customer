@@ -6,6 +6,7 @@ import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
+	output: 'standalone',
 	reactStrictMode: true,
 
 	// Allow cross-origin requests in development for browser preview

@@ -1,65 +1,51 @@
-# Multi-stage Dockerfile for Next.js T3 Stack Application
-
-# Stage 1: Dependencies
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
-
-# Copy package files
-COPY package.json yarn.lock* ./
-
-# Install dependencies
-RUN yarn install --frozen-lockfile
-
-# Stage 2: Builder
-FROM node:20-alpine AS builder
-WORKDIR /app
-
-# Copy package files and install dependencies
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Set environment variables for build
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
-ENV SKIP_ENV_VALIDATION=1
-
-# Build the application
-RUN yarn build
-
-# Stage 3: Runner (Production)
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy necessary files
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/yarn.lock ./yarn.lock
-COPY --from=builder /app/next.config.js ./next.config.js
-COPY --from=builder /app/public ./public
-
-# Copy built application and necessary files
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src/ ./src/
-
-RUN chown -R root:root /app && chmod -R a+rwx /app
-
-# Switch to non-root user
-USER nextjs
-
-
-# Expose port
-EXPOSE 3000
-
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-ENV SKIP_ENV_VALIDATION=1 
-
-# Start the application
-CMD ["yarn", "start"]
+# ---------- Stage 1: Builder ----------
+    FROM node:20-alpine AS builder
+    RUN apk add --no-cache libc6-compat
+    WORKDIR /app
+    
+    ENV NEXT_TELEMETRY_DISABLED=1 \
+        NODE_ENV=production \
+        SKIP_ENV_VALIDATION=1
+    
+    # Enable Corepack for Yarn 3+
+    RUN corepack enable
+    
+    # Copy package files
+    COPY package.json yarn.lock* ./
+    
+    # Install deps for build
+    RUN yarn install --frozen-lockfile
+    
+    # Copy rest of the app
+    COPY . .
+    
+    # Build standalone Next.js app (Next.js 13+)
+    RUN yarn build && rm -rf node_modules && yarn install --production --ignore-scripts --prefer-offline
+    
+    # Clean build caches
+    RUN rm -rf .next/cache
+    
+    # ---------- Stage 2: Runner ----------
+    FROM node:20-alpine AS runner
+    WORKDIR /app
+    
+    # Create non-root user
+    RUN addgroup --system --gid 1001 nodejs \
+      && adduser --system --uid 1001 nextjs
+    
+    ENV NODE_ENV=production \
+        NEXT_TELEMETRY_DISABLED=1 \
+        PORT=3000 \
+        HOSTNAME="0.0.0.0"
+    
+    # Copy only standalone output (this is key for smaller images)
+    COPY --from=builder /app/.next/standalone ./
+    COPY --from=builder /app/.next/static ./.next/static
+    COPY --from=builder /app/public ./public
+    
+    USER nextjs
+    EXPOSE 3000
+    
+    # Use node directly (not yarn)
+    CMD ["node", "server.js"]
+    
