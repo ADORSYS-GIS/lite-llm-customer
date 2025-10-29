@@ -2,9 +2,11 @@ name: docker-build
 
 on:
   push:
-    branches: main
+    branches: 
+      - feat/dockerize-application
   pull_request:
-    branches: main
+    branches: 
+      - feat/dockerize-application
 
 jobs:
   docker-build:
