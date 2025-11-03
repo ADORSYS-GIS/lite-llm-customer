@@ -43,6 +43,7 @@
     COPY --from=builder /app/.next/static ./.next/static
     COPY --from=builder /app/public ./public
     
+    RUN chown -R root:root /app && chmod -R a+rwx /app
     USER nextjs
     EXPOSE 3000
     
