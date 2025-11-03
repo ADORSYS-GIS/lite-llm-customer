@@ -3,15 +3,15 @@ name: docker-build
 on:
   push:
     branches:
-      - feat/dockerize-application
+      - main
   pull_request:
     branches:
-      - feat/dockerize-application
+      - main
 
 jobs:
   docker-build:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/dockerize-application'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
