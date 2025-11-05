@@ -1,0 +1,33 @@
+model_list:
+  - model_name: "llama3.2"
+    litellm_params:
+      model: "ollama_chat/llama3.2"
+      api_base: "http://ollama:11434"
+    model_info:
+      input_cost_per_token: 0.00002    # $0.00002 per input token
+      output_cost_per_token: 0.00004   # $0.00004 per output token
+      input_cost_per_second: 0.001     # $0.001 per second of processing input
+      output_cost_per_second: 0.002    # $0.002 per second of processing output
+      cache_creation_input_token_cost: 0.00001
+      cache_read_input_token_cost: 0.000005
+
+  # Add more models as needed
+  - model_name: "codellama"
+    litellm_params:
+      model: "ollama_chat/codellama"
+      api_base: "http://ollama:11434"
+    model_info:
+      input_cost_per_token: 0.00003
+      output_cost_per_token: 0.00006
+
+  - model_name: "mistral"
+    litellm_params:
+      model: "ollama_chat/mistral"
+      api_base: "http://ollama:11434"
+    model_info:
+      input_cost_per_token: 0.000025
+      output_cost_per_token: 0.00005
+
+general_settings:
+  master_key: sk-1234
+  database_url: postgres://litellm:secret@db:5432/litellm
