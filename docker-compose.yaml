@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    # Optional: Enable GPU support
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  db:
+    image: postgres:15
+    container_name: litellm-db
+    restart: always
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: litellm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm
+    depends_on:
+      - db
+      - ollama
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml:ro
+    environment:
+      LITELLM_MASTER_KEY: sk-1234
+      LITELLM_SALT_KEY: this-is-a-random-salt
+      DATABASE_URL: postgres://litellm:secret@db:5432/litellm
+    command: ["--config", "/app/config.yaml"]
+
+  litellm-customer:
+    image: ghcr.io/adorsys-gis/lite-llm-customer:main-120bff8
+    container_name: litellm-customer
+    depends_on:
+      - litellm
+    ports:
+      - "3000:3000"
+    environment:
+      LITELLM_PROXY_URL: "http://litellm:4000"
+      LITELLM_API_KEY: "sk-1234"
+      NEXTAUTH_SECRET: "supersecret"
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "password"
+
+volumes:
+  ollama:
+  pgdata:
