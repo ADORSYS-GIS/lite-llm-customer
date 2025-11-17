@@ -13,6 +13,9 @@ export const env = createEnv({
 		NEXTAUTH_SECRET: z.string(),
 		ADMIN_EMAIL: z.string().email(),
 		ADMIN_PASSWORD: z.string(),
+		KEYCLOAK_CLIENT_ID: z.string(),
+		KEYCLOAK_CLIENT_SECRET: z.string(),
+		KEYCLOAK_ISSUER: z.string().url(),
 	},
 
 	/**
@@ -35,6 +38,9 @@ export const env = createEnv({
 		NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
 		ADMIN_EMAIL: process.env.ADMIN_EMAIL,
 		ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+		KEYCLOAK_CLIENT_ID: process.env.KEYCLOAK_CLIENT_ID,
+		KEYCLOAK_CLIENT_SECRET: process.env.KEYCLOAK_CLIENT_SECRET,
+		KEYCLOAK_ISSUER: process.env.KEYCLOAK_ISSUER,
 		// NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 	},
 	/**

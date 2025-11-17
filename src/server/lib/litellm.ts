@@ -430,3 +430,118 @@ export async function updateBudget(budget_id: string, max_budget: number) {
 		});
 	}
 }
+
+const GenerateKeyPayloadSchema = z.object({
+	key_alias: z.string().optional(),
+	user_id: z.string(),
+	models: z.array(z.string()).optional(),
+	max_budget: z.number().optional(),
+});
+
+const GenerateKeyResponseSchema = z.object({
+	key: z.string(),
+});
+
+const RegenerateKeyResponseSchema = z.object({
+	new_key: z.string(),
+});
+
+/**
+ * Generates a new API key for a user.
+ * @param payload The payload containing user_id and optional parameters.
+ * @returns A promise that resolves to the generated key.
+ * @throws Throws a TRPCError if the API call fails or the response is invalid.
+ */
+export async function generateKey(
+	payload: z.infer<typeof GenerateKeyPayloadSchema>,
+) {
+	try {
+		const response = await litellmClient.post("/key/generate", payload);
+		return GenerateKeyResponseSchema.parse(response.data);
+	} catch (error) {
+		if (isAxiosError(error)) {
+			// Handle different response formats
+			let errorMessage = "Failed to generate API key.";
+			if (error.response?.data?.error?.message) {
+				errorMessage = error.response.data.error.message;
+			} else if (typeof error.response?.data === "string") {
+				errorMessage = error.response.data;
+			} else if (error.response?.statusText) {
+				errorMessage = error.response.statusText;
+			}
+
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: errorMessage,
+				cause: error,
+			});
+		}
+
+		// Handle Zod validation errors
+		if (error instanceof Error && error.message.includes("ZodError")) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: `Invalid response format: ${error.message}`,
+				cause: error,
+			});
+		}
+
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: "Failed to generate API key.",
+			cause: error,
+		});
+	}
+}
+
+/**
+ * Regenerates an existing API key by generating a new one.
+ * Since regeneration requires enterprise license, we generate a new key instead.
+ * @param userId The user ID to generate a new key for.
+ * @returns A promise that resolves to the new key.
+ * @throws Throws a TRPCError if the API call fails or the response is invalid.
+ */
+export async function regenerateKey(userId: string) {
+	try {
+		const timestamp = Date.now();
+		const payload = {
+			user_id: userId,
+			key_alias: `admin-${userId}-regenerated-${timestamp}`,
+		};
+		const response = await litellmClient.post("/key/generate", payload);
+		return GenerateKeyResponseSchema.parse(response.data);
+	} catch (error) {
+		if (isAxiosError(error)) {
+			// Handle different response formats
+			let errorMessage = "Failed to regenerate API key.";
+			if (error.response?.data?.error?.message) {
+				errorMessage = error.response.data.error.message;
+			} else if (typeof error.response?.data === "string") {
+				errorMessage = error.response.data;
+			} else if (error.response?.statusText) {
+				errorMessage = error.response.statusText;
+			}
+
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: errorMessage,
+				cause: error,
+			});
+		}
+
+		// Handle Zod validation errors
+		if (error instanceof Error && error.message.includes("ZodError")) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: `Invalid response format: ${error.message}`,
+				cause: error,
+			});
+		}
+
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: "Failed to regenerate API key.",
+			cause: error,
+		});
+	}
+}

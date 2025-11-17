@@ -1,7 +1,6 @@
 import { env } from "@/env.js";
-import type { NextAuthOptions } from "next-auth";
-import NextAuth, { type DefaultSession } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth, { type DefaultSession, type NextAuthOptions } from "next-auth";
+import KeycloakProvider from "next-auth/providers/keycloak";
 
 declare module "next-auth" {
 	interface Session {
@@ -15,25 +14,10 @@ declare module "next-auth" {
 
 export const authOptions: NextAuthOptions = {
 	providers: [
-		CredentialsProvider({
-			name: "Credentials",
-			credentials: {
-				email: { label: "Email", type: "text" },
-				password: { label: "Password", type: "password" },
-			},
-			async authorize(credentials) {
-				if (
-					credentials?.email === env.ADMIN_EMAIL &&
-					credentials?.password === env.ADMIN_PASSWORD
-				) {
-					return {
-						id: "1",
-						name: "Admin User",
-						email: env.ADMIN_EMAIL,
-					};
-				}
-				return null;
-			},
+		KeycloakProvider({
+			clientId: env.KEYCLOAK_CLIENT_ID,
+			clientSecret: env.KEYCLOAK_CLIENT_SECRET,
+			issuer: env.KEYCLOAK_ISSUER,
 		}),
 	],
 	secret: env.NEXTAUTH_SECRET,

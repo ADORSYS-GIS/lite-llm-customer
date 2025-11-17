@@ -1,3 +1,4 @@
+import { ApiKeyModal } from "@/components/ApiKeyModal";
 import { Spinner } from "@/components/Spinner";
 import { api } from "@/utils/api";
 import type { NextPage } from "next";
@@ -7,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const BudgetsPage: NextPage = () => {
 	const [mobileOpen, setMobileOpen] = useState(false);
+	const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
 	// Pagination state for budgets table
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSize] = useState(10);
@@ -145,6 +147,13 @@ const BudgetsPage: NextPage = () => {
 										d="M4 6h16M4 12h16M4 18h16"
 									/>
 								</svg>
+							</button>
+							<button
+								type="button"
+								onClick={() => setApiKeyModalOpen(true)}
+								className="font-medium text-slate-600 text-sm transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+							>
+								API Key
 							</button>
 							<button
 								type="button"
@@ -484,6 +493,11 @@ const BudgetsPage: NextPage = () => {
 					)}
 				</div>
 			</main>
+
+			<ApiKeyModal
+				isOpen={apiKeyModalOpen}
+				onClose={() => setApiKeyModalOpen(false)}
+			/>
 		</div>
 	);
 };
