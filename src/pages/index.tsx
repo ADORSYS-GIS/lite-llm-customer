@@ -1,3 +1,4 @@
+import { ApiKeyModal } from "@/components/ApiKeyModal";
 import { api } from "@/utils/api";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -5,6 +6,7 @@ import { useState } from "react";
 
 export default function AdminDashboard() {
 	const [mobileOpen, setMobileOpen] = useState(false);
+	const [apiKeyModalOpen, setApiKeyModalOpen] = useState(false);
 	const { data: session } = useSession();
 	const { data: customers } = api.budget.listCustomersDetailed.useQuery();
 	const { data: healthStatus } = api.system.health.useQuery();
@@ -301,6 +303,37 @@ export default function AdminDashboard() {
 									</p>
 								</div>
 							</Link>
+							<button
+								type="button"
+								onClick={() => setApiKeyModalOpen(true)}
+								className="flex w-full items-center rounded-lg border border-slate-200 p-3 text-left transition-colors hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+							>
+								<div className="mr-3 flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
+									<svg
+										className="h-5 w-5 text-green-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										role="img"
+									>
+										<title>API Key Icon</title>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+										/>
+									</svg>
+								</div>
+								<div>
+									<p className="font-medium text-slate-900 dark:text-white">
+										Manage API Key
+									</p>
+									<p className="text-slate-600 text-sm dark:text-slate-400">
+										Generate or regenerate your API key
+									</p>
+								</div>
+							</button>
 						</div>
 					</div>
 
@@ -316,7 +349,9 @@ export default function AdminDashboard() {
 										className={`mr-3 h-3 w-3 rounded-full ${
 											healthStatus?.status === "Online"
 												? "bg-green-500"
-												: "bg-red-500"
+												: healthStatus?.status === "Timeout"
+													? "bg-yellow-500"
+													: "bg-red-500"
 										}`}
 									/>
 									<span className="text-slate-900 dark:text-white">
@@ -327,7 +362,9 @@ export default function AdminDashboard() {
 									className={`font-medium text-sm ${
 										healthStatus?.status === "Online"
 											? "text-green-500"
-											: "text-red-500"
+											: healthStatus?.status === "Timeout"
+												? "text-yellow-500"
+												: "text-red-500"
 									}`}
 								>
 									{healthStatus?.status ?? "Loading..."}
@@ -337,6 +374,11 @@ export default function AdminDashboard() {
 					</div>
 				</div>
 			</main>
+
+			<ApiKeyModal
+				isOpen={apiKeyModalOpen}
+				onClose={() => setApiKeyModalOpen(false)}
+			/>
 		</div>
 	);
 }

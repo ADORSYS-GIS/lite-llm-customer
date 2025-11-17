@@ -1,5 +1,6 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { budgetRouter } from "./routers/budget";
+import { keyRouter } from "./routers/key";
 import { systemRouter } from "./routers/system";
 
 /**
@@ -9,6 +10,7 @@ import { systemRouter } from "./routers/system";
  */
 export const appRouter = createTRPCRouter({
 	budget: budgetRouter,
+	key: keyRouter,
 	system: systemRouter,
 });
 
