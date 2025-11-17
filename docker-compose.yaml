@@ -59,6 +59,18 @@ services:
       NEXTAUTH_SECRET: "supersecret"
       ADMIN_EMAIL: "admin@example.com"
       ADMIN_PASSWORD: "password"
+      KEYCLOAK_CLIENT_ID: "litellm-customer"
+      KEYCLOAK_CLIENT_SECRET: "secret"
+      KEYCLOAK_ISSUER: "http://localhost:8080/realms/litellm"
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: "start-dev"
 
 volumes:
   ollama:
