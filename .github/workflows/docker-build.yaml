@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 23-add-keycloak-integration-to-lightbridge-dashboard
   pull_request:
     branches:
       - main
