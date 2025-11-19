@@ -62,6 +62,7 @@ services:
       KEYCLOAK_CLIENT_ID: "litellm-customer"
       KEYCLOAK_CLIENT_SECRET: "secret"
       KEYCLOAK_ISSUER: "http://localhost:8080/realms/litellm"
+
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
@@ -71,6 +72,18 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     command: "start-dev"
+
+  keycloak-config-cli:
+    image: adorsys/keycloak-config-cli:latest
+    depends_on:
+      - keycloak
+    environment:
+      - KEYCLOAK_URL=http://keycloak:8080/
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - IMPORT_FILES_LOCATIONS=/config/*
+    volumes:
+      - ./keycloak-config:/config
 
 volumes:
   ollama:
