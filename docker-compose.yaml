@@ -59,9 +59,9 @@ services:
       NEXTAUTH_SECRET: "supersecret"
       ADMIN_EMAIL: "admin@example.com"
       ADMIN_PASSWORD: "password"
-      KEYCLOAK_CLIENT_ID: "litellm-customer"
-      KEYCLOAK_CLIENT_SECRET: "secret"
-      KEYCLOAK_ISSUER: "http://localhost:8080/realms/litellm"
+      KEYCLOAK_CLIENT_ID: "lightbridge-dashboard"
+      KEYCLOAK_CLIENT_SECRET: "r38PLYhQPerHnqsjc4lTVBEjsUr7QjA1"
+      KEYCLOAK_ISSUER: "http://localhost:8080/realms/lightbridge"
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
