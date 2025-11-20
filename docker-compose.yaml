@@ -47,7 +47,7 @@ services:
     command: ["--config", "/app/config.yaml"]
 
   litellm-customer:
-    image: ghcr.io/adorsys-gis/lite-llm-customer:main-120bff8
+    image: ghcr.io/adorsys-gis/lite-llm-customer/liteclient:latest
     container_name: litellm-customer
     depends_on:
       - litellm
@@ -62,6 +62,7 @@ services:
       KEYCLOAK_CLIENT_ID: "lightbridge-dashboard"
       KEYCLOAK_CLIENT_SECRET: "r38PLYhQPerHnqsjc4lTVBEjsUr7QjA1"
       KEYCLOAK_ISSUER: "http://localhost:8080/realms/lightbridge"
+      NEXTAUTH_URL: "http://localhost:3000"
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
