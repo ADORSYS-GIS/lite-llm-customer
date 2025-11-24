@@ -44,7 +44,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=ref,event=branch
-            type=sha,prefix={{branch}}-
+            type=sha,prefix=main-
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
