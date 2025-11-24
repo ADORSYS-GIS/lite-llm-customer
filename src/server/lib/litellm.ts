@@ -446,6 +446,54 @@ const RegenerateKeyResponseSchema = z.object({
 	new_key: z.string(),
 });
 
+const ListKeysResponseSchema = z.array(
+	z
+		.object({
+			key: z.string(),
+			key_alias: z.string().optional(),
+			user_id: z.string().optional(),
+			// Allow additional fields that might be present
+		})
+		.catchall(z.any()),
+);
+
+/**
+ * Lists all API keys.
+ * @returns A promise that resolves to a list of keys.
+ * @throws Throws a TRPCError if the API call fails or the response is invalid.
+ */
+export async function listKeys() {
+	try {
+		const response = await litellmClient.get("/key/list");
+		// Handle both JSON and potential HTML error responses
+		let data: unknown;
+		if (typeof response.data === "string") {
+			data = JSON.parse(response.data);
+		} else {
+			data = response.data;
+		}
+		return ListKeysResponseSchema.parse(data);
+	} catch (error) {
+		if (isAxiosError(error)) {
+			// Handle HTML error responses
+			if (error.response?.headers?.["content-type"]?.includes("text/html")) {
+				return []; // Return empty array instead of throwing
+			}
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message:
+					error.response?.data?.error?.message ?? "Failed to list API keys.",
+				cause: error,
+			});
+		}
+		throw new TRPCError({
+			code: "INTERNAL_SERVER_ERROR",
+			message: "Failed to list API keys.",
+			cause: error,
+		});
+	}
+}
+
 /**
  * Generates a new API key for a user.
  * @param payload The payload containing user_id and optional parameters.
@@ -503,10 +551,12 @@ export async function generateKey(
  */
 export async function regenerateKey(userId: string) {
 	try {
+		// Generate a unique alias with timestamp to avoid conflicts
 		const timestamp = Date.now();
+		const randomSuffix = Math.random().toString(36).substring(2, 8);
 		const payload = {
 			user_id: userId,
-			key_alias: `admin-${userId}-regenerated-${timestamp}`,
+			key_alias: `admin-${userId}-${timestamp}-${randomSuffix}`,
 		};
 		const response = await litellmClient.post("/key/generate", payload);
 		return GenerateKeyResponseSchema.parse(response.data);

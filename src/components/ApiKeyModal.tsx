@@ -19,6 +19,7 @@ export function ApiKeyModal({ isOpen, onClose }: Readonly<ApiKeyModalProps>) {
 
 	useEffect(() => {
 		if (session?.user?.id) {
+			// Check localStorage for existing key
 			const storedKey = localStorage.getItem(
 				`litellm-api-key-${session.user.id}`,
 			);
@@ -31,13 +32,36 @@ export function ApiKeyModal({ isOpen, onClose }: Readonly<ApiKeyModalProps>) {
 
 		setIsGenerating(true);
 		try {
-			const result = await generateKeyMutation.mutateAsync({
-				key_alias: `admin-${session.user.id}`,
-			});
-			setCurrentKey(result.key);
-			localStorage.setItem(`litellm-api-key-${session.user.id}`, result.key);
+			// Try to generate first, if it fails with "already exists", then regenerate
+			try {
+				const result = await generateKeyMutation.mutateAsync({
+					key_alias: `admin-${session.user.id}`,
+				});
+				setCurrentKey(result.key);
+				localStorage.setItem(`litellm-api-key-${session.user.id}`, result.key);
+			} catch (generateError: unknown) {
+				const errorMessage =
+					generateError instanceof Error
+						? generateError.message
+						: String(generateError);
+				// If the error is about alias already existing, try regenerate
+				if (
+					errorMessage.includes("already exists") ||
+					errorMessage.includes("Unique key aliases")
+				) {
+					const result = await regenerateKeyMutation.mutateAsync({});
+					setCurrentKey(result.key);
+					localStorage.setItem(
+						`litellm-api-key-${session.user.id}`,
+						result.key,
+					);
+				} else {
+					// Re-throw other errors
+					throw generateError;
+				}
+			}
 		} catch (error) {
-			console.error("Failed to generate API key:", error);
+			console.error("Failed to generate/regenerate API key:", error);
 		} finally {
 			setIsGenerating(false);
 		}
@@ -139,16 +163,7 @@ export function ApiKeyModal({ isOpen, onClose }: Readonly<ApiKeyModalProps>) {
 					)}
 
 					<div className="flex space-x-2">
-						{!currentKey ? (
-							<button
-								type="button"
-								onClick={handleGenerateKey}
-								disabled={isGenerating}
-								className="flex-1 rounded-md bg-primary px-4 py-2 font-medium text-sm text-white hover:bg-primary/90 disabled:opacity-50"
-							>
-								{isGenerating ? "Generating..." : "Generate API Key"}
-							</button>
-						) : (
+						{currentKey ? (
 							<button
 								type="button"
 								onClick={handleRegenerateKey}
@@ -156,6 +171,15 @@ export function ApiKeyModal({ isOpen, onClose }: Readonly<ApiKeyModalProps>) {
 								className="flex-1 rounded-md bg-red-500 px-4 py-2 font-medium text-sm text-white hover:bg-red-600 disabled:opacity-50"
 							>
 								{isRegenerating ? "Regenerating..." : "Regenerate API Key"}
+							</button>
+						) : (
+							<button
+								type="button"
+								onClick={handleGenerateKey}
+								disabled={isGenerating}
+								className="flex-1 rounded-md bg-primary px-4 py-2 font-medium text-sm text-white hover:bg-primary/90 disabled:opacity-50"
+							>
+								{isGenerating ? "Generating..." : "Generate API Key"}
 							</button>
 						)}
 					</div>
