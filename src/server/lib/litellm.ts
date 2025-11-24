@@ -446,12 +446,16 @@ const RegenerateKeyResponseSchema = z.object({
 	new_key: z.string(),
 });
 
-const ListKeysResponseSchema = z.array(z.object({
-	key: z.string(),
-	key_alias: z.string().optional(),
-	user_id: z.string().optional(),
-	// Allow additional fields that might be present
-}).catchall(z.any()));
+const ListKeysResponseSchema = z.array(
+	z
+		.object({
+			key: z.string(),
+			key_alias: z.string().optional(),
+			user_id: z.string().optional(),
+			// Allow additional fields that might be present
+		})
+		.catchall(z.any()),
+);
 
 /**
  * Lists all API keys.
@@ -463,7 +467,7 @@ export async function listKeys() {
 		const response = await litellmClient.get("/key/list");
 		// Handle both JSON and potential HTML error responses
 		let data: unknown;
-		if (typeof response.data === 'string') {
+		if (typeof response.data === "string") {
 			data = JSON.parse(response.data);
 		} else {
 			data = response.data;
@@ -472,7 +476,7 @@ export async function listKeys() {
 	} catch (error) {
 		if (isAxiosError(error)) {
 			// Handle HTML error responses
-			if (error.response?.headers?.['content-type']?.includes('text/html')) {
+			if (error.response?.headers?.["content-type"]?.includes("text/html")) {
 				return []; // Return empty array instead of throwing
 			}
 			throw new TRPCError({

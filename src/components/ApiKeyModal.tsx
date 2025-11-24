@@ -20,7 +20,9 @@ export function ApiKeyModal({ isOpen, onClose }: Readonly<ApiKeyModalProps>) {
 	useEffect(() => {
 		if (session?.user?.id) {
 			// Check localStorage for existing key
-			const storedKey = localStorage.getItem(`litellm-api-key-${session.user.id}`);
+			const storedKey = localStorage.getItem(
+				`litellm-api-key-${session.user.id}`,
+			);
 			setCurrentKey(storedKey);
 		}
 	}, [session]);
@@ -38,12 +40,21 @@ export function ApiKeyModal({ isOpen, onClose }: Readonly<ApiKeyModalProps>) {
 				setCurrentKey(result.key);
 				localStorage.setItem(`litellm-api-key-${session.user.id}`, result.key);
 			} catch (generateError: unknown) {
-				const errorMessage = generateError instanceof Error ? generateError.message : String(generateError);
+				const errorMessage =
+					generateError instanceof Error
+						? generateError.message
+						: String(generateError);
 				// If the error is about alias already existing, try regenerate
-				if (errorMessage.includes('already exists') || errorMessage.includes('Unique key aliases')) {
+				if (
+					errorMessage.includes("already exists") ||
+					errorMessage.includes("Unique key aliases")
+				) {
 					const result = await regenerateKeyMutation.mutateAsync({});
 					setCurrentKey(result.key);
-					localStorage.setItem(`litellm-api-key-${session.user.id}`, result.key);
+					localStorage.setItem(
+						`litellm-api-key-${session.user.id}`,
+						result.key,
+					);
 				} else {
 					// Re-throw other errors
 					throw generateError;
