@@ -47,7 +47,7 @@ services:
     command: ["--config", "/app/config.yaml"]
 
   litellm-customer:
-    image: ghcr.io/adorsys-gis/lite-llm-customer:main-120bff8
+    image: ghcr.io/adorsys-gis/lite-llm-customer/liteclient:latest
     container_name: litellm-customer
     depends_on:
       - litellm
@@ -59,19 +59,68 @@ services:
       NEXTAUTH_SECRET: "supersecret"
       ADMIN_EMAIL: "admin@example.com"
       ADMIN_PASSWORD: "password"
-      KEYCLOAK_CLIENT_ID: "litellm-customer"
-      KEYCLOAK_CLIENT_SECRET: "secret"
-      KEYCLOAK_ISSUER: "http://localhost:8080/realms/litellm"
+      KEYCLOAK_CLIENT_ID: "lightbridge-dashboard"
+      KEYCLOAK_CLIENT_SECRET: "r38PLYhQPerHnqsjc4lTVBEjsUr7QjA1"
+      KEYCLOAK_ISSUER: "http://keycloak:8080/realms/lightbridge"
+      NEXTAUTH_URL: "http://localhost:3000"
+
+  keycloak-db:
+    image: postgres:15
+    container_name: keycloak-db
+    restart: always
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak-password
+    volumes:
+      - keycloak_pgdata:/var/lib/postgresql/data
+
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
+    depends_on:
+      - keycloak-db
     ports:
       - "8080:8080"
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-    command: "start-dev"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak-password
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_URL: http://localhost:8080
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    command:
+      - start
+      - --health-enabled=true
+      - --http-port=8080
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 3 sh -c 'cat < /dev/null > /dev/tcp/localhost/8080' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  keycloak-config-cli:
+    image: adorsys/keycloak-config-cli:latest
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      - KEYCLOAK_URL=http://keycloak:8080/
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - IMPORT_FILES_LOCATIONS=/config/*
+    volumes:
+      - ./keycloak-config:/config
 
 volumes:
+  keycloak_data:
+  keycloak_pgdata:
   ollama:
   pgdata:
