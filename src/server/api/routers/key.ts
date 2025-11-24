@@ -8,6 +8,10 @@ const generateKeyInputSchema = z.object({
 	max_budget: z.number().optional(),
 });
 
+const regenerateKeyInputSchema = z.object({
+	key: z.string().min(1, "key is required"),
+});
+
 export const keyRouter = createTRPCRouter({
 	generateKey: adminProcedure
 		.input(generateKeyInputSchema)

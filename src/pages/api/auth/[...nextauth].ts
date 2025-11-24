@@ -21,7 +21,6 @@ export const authOptions: NextAuthOptions = {
 		}),
 	],
 	secret: env.NEXTAUTH_SECRET,
-	...(env.NEXTAUTH_URL && { url: env.NEXTAUTH_URL }),
 	callbacks: {
 		async jwt({ token, user }) {
 			if (user) {
