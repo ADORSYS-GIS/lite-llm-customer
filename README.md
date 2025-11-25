@@ -57,3 +57,30 @@ Refer to `src/server/api/routers/budget.ts` for implementation details.
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+
+## Docker Image Build and Release
+
+This project includes a GitHub Actions workflow that automatically builds and publishes Docker images to GitHub Container Registry (ghcr.io) when:
+
+- Code is pushed to the `main` branch
+- A new tag with format `v*` is created (e.g., `v1.0.0`)
+- Pull requests are created (builds but doesn't push the image)
+
+### Image Tags
+
+The workflow creates Docker images with the following tags:
+
+- Semantic version tags when a release tag is pushed (e.g., `v1.2.3` → `1.2.3`, `1.2`)
+- Branch name for pushes to branches
+- PR number for pull requests
+- Git SHA for all builds
+
+### Using the Docker Image
+
+You can pull the image using:
+
+```bash
+docker pull ghcr.io/[owner]/lite-llm-customer:[tag]
+```
+
+Replace `[owner]` with your GitHub username or organization name, and `[tag]` with the specific version tag you want to use.
