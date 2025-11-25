@@ -2,8 +2,9 @@ name: Release Docker Image
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
 
 env:
   REGISTRY: ghcr.io
